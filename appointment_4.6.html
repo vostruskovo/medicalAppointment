@@ -1728,7 +1728,7 @@
 <body>
     <script>
         //each 1st letter for every word is capitalized
-        function capital(str) {
+        function capitalized(str) {
             return str.split(' ').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
@@ -1751,14 +1751,16 @@
                 "ginecologista",
                 "endocrinologista", 
                 "gastroenterologista",
-                "clínico geral"
+                "clínico geral",
+                "cirurgia geral",
+                "urologia"
             ];
             
             values.sort();
             
             for(let i in values) {
-                document.write(`<option value="${FirstOneUpperCase(values[i])}">
-                    ${FirstOneUpperCase(values[i])}</option>`);
+                document.write(`<option value="${capitalized(values[i])}">
+                    ${capitalized(values[i])}</option>`);
             }
         }
     </script>
@@ -4453,8 +4455,8 @@
             }
             
             modalCardNumberSpan.textContent = index + 1;
-            modalPacientInput.value = capital(data.pacient);
-            modalHospitalInput.value = capital(data.hospital);
+            modalPacientInput.value = capitalized(data.pacient);
+            modalHospitalInput.value = capitalized(data.hospital);
             modalSpecialityInput.value = data.speciality;
             modalDateInput.value = formatDateForInput(data.date);
             modalHourInput.value = data.hour;
@@ -4558,12 +4560,12 @@
             }
             
             cardData[currentEditingCardIndex] = {
-                pacient: capital(modalPacientInput.value) || "Não informado",
-                hospital: capital(modalHospitalInput.value) || "Não informado",
+                pacient: capitalized(modalPacientInput.value) || "Não informado",
+                hospital: capitalized(modalHospitalInput.value) || "Não informado",
                 speciality: modalSpecialityInput.value || "Não informado",
                 date: formatDate(modalDateInput.value) || "Não informado",
                 hour: modalHourInput.value || "Não informado",
-                address: capital(modalAddressInput.value) || "Não informado"
+                address: capitalized(modalAddressInput.value) || "Não informado"
             };
             
             updateCardDisplay(currentEditingCardIndex);
@@ -4606,10 +4608,10 @@
         
         // Apply settings to all cards
         function applyToAllCards() {
-            const pacient = capital(globalPacientInput.value) || "Alex Silva";
-            const hospital = capital(globalHospitalInput.value) || "Santa Bárbara";
+            const pacient = capitalized(globalPacientInput.value) || "Alex Silva";
+            const hospital = capitalized(globalHospitalInput.value) || "Santa Bárbara";
             const speciality = globalSpecialityInput.value || "otorrinolaringologista";
-            const address = capital(globalAddressInput.value) || "Av. Dom João VI, 1291 - Brotas, Salvador - BA";
+            const address = capitalized(globalAddressInput.value) || "Av. Dom João VI, 1291 - Brotas, Salvador - BA";
             
             let date = formatDate(globalDateInput.value) || "23/01/2026";
             let hour = formatTime(globalHourInput.value) || "08:00";
@@ -5060,7 +5062,7 @@
         saveGlobalHospitalBtn.addEventListener('click', function() {
             const hospital = globalHospitalInput.value.trim();
             if (hospital) {
-                openSaveHospitalModal(capital(hospital), 'global');
+                openSaveHospitalModal(capitalized(hospital), 'global');
             } else {
                 showFeedback('Por favor, digite um nome de hospital/clínica para salvar.', 'warning');
             }
@@ -5069,7 +5071,7 @@
         saveModalHospitalBtn.addEventListener('click', function() {
             const hospital = modalHospitalInput.value.trim();
             if (hospital) {
-                openSaveHospitalModal(capital(hospital), 'modal');
+                openSaveHospitalModal(capitalized(hospital), 'modal');
             } else {
                 showFeedback('Por favor, digite um nome de hospital/clínica para salvar.', 'warning');
             }
@@ -5078,7 +5080,7 @@
         saveGlobalPacientBtn.addEventListener('click', function() {
             const user = globalPacientInput.value.trim();
             if (user) {
-                openSaveUserModal(capital(user), 'global');
+                openSaveUserModal(capitalized(user), 'global');
             } else {
                 showFeedback('Por favor, digite um nome para salvar.', 'warning');
             }
@@ -5087,7 +5089,7 @@
         saveModalPacientBtn.addEventListener('click', function() {
             const user = modalPacientInput.value.trim();
             if (user) {
-                openSaveUserModal(capital(user), 'modal');
+                openSaveUserModal(capitalized(user), 'modal');
             } else {
                 showFeedback('Por favor, digite um nome para salvar.', 'warning');
             }
