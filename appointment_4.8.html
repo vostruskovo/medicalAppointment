@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedCard Pro - Sistema de Agendamentos Médicos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        :root {
+            --primary: #0f5c6e;
+            --primary-dark: #0a4654;
+            --primary-light: #e6f4f0;
+            --secondary: #2c7a5e;
+            --accent: #f4a261;
+            --danger: #e76f51;
+            --success: #2a9d8f;
+            --warning: #e9c46a;
+            --gray-50: #fafcfc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+            color: var(--gray-800);
+            padding: 24px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 28px 32px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: white;
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.85);
+            margin-top: 6px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+        
+        .control-panel {
+            flex: 1.2;
+            min-width: 340px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 28px;
+        }
+        
+        .preview-section {
+            flex: 2.2;
+            min-width: 380px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15,92,110,0.1);
+        }
+        
+        .field-input-container {
+            position: relative;
+        }
+        
+        .field-save-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 6px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        
+        .field-save-btn:hover {
+            background: var(--primary-light);
+        }
+        
+        .layout-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 8px 0 4px;
+        }
+        
+        .layout-option {
+            padding: 12px 8px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .layout-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .layout-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        
+        .button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        
+        .button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .button.secondary {
+            background: var(--success);
+        }
+        
+        .button.danger {
+            background: var(--danger);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        /* Paper Sheet & Cards - ENHANCED LOGO SIZE */
+        .paper-sheet {
+            background: white;
+            box-shadow: var(--shadow-lg);
+            margin: 0 auto;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 850px;
+        }
+        
+        .appointments-grid {
+            display: grid;
+            background: white;
+            padding: 24px;
+            gap: 20px;
+        }
+        
+        .layout-1-cards { grid-template-columns: 1fr; }
+        .layout-2-cards { grid-template-columns: 1fr; gap: 24px; }
+        .layout-4-cards { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .layout-6-cards { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .layout-8-cards { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        
+        .appointment-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .appointment-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        /* ENLARGED LOGO CONTAINER */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        
+        .card-logo-container {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, #ffffff 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+        
+        .card-logo-container:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+        
+        .card-logo {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .hospital-name {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+            flex: 1;
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+        }
+        
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gray-600);
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            background: var(--gray-100);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .appointment-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        
+        .detail-row {
+            display: flex;
+            font-size: 0.85rem;
+            align-items: baseline;
+            border-bottom: 1px dashed var(--gray-200);
+            padding-bottom: 6px;
+        }
+        
+        .detail-label {
+            font-weight: 700;
+            color: var(--primary);
+            min-width: 80px;
+            font-size: 0.8rem;
+        }
+        
+        .detail-value {
+            color: var(--gray-800);
+            flex: 1;
+            word-break: break-word;
+            font-weight: 500;
+        }
+        
+        .card-footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--gray-600);
+            border-top: 1px solid var(--gray-200);
+            padding-top: 12px;
+            margin-top: 8px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+        
+        /* Enhanced Copy Badge */
+        .copy-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--warning);
+            color: #5a4a1a;
+            width: 34px;
+            height: 34px;
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .copy-badge:hover {
+            transform: scale(1.08);
+            background: #e9b35f;
+            width: auto;
+            padding: 0 14px;
+            gap: 6px;
+        }
+        
+        .copy-badge:hover::after {
+            content: "Copiar";
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
+        
+        .copy-badge.copied {
+            background: var(--success);
+            color: white;
+            width: auto;
+            padding: 0 14px;
+        }
+        
+        .copy-badge.copied::after {
+            content: "✓ Copiado!";
+            font-size: 0.75rem;
+            margin-left: 6px;
+        }
+        
+        .paste-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: fadeUp 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            pointer-events: none;
+        }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+            animation: modalFade 0.2s ease;
+        }
+        
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .saved-cards-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+        
+        .saved-cards-section.active {
+            display: block;
+            animation: fadeSlide 0.3s ease;
+        }
+        
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .saved-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .saved-card-item {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .saved-card-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .toggle-saved-cards-btn {
+            background: var(--gray-600);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toggle-saved-cards-btn.active {
+            background: var(--primary);
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 40px;
+        }
+        
+        .feedback-message {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            border-radius: 50px;
+            background: var(--gray-800);
+            color: white;
+            font-weight: 500;
+            z-index: 1100;
+            animation: slideRight 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        @keyframes slideRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .saved-items-container {
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 8px;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            font-size: 0.75rem;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .layout-options { grid-template-columns: repeat(3, 1fr); }
+            .card-logo-container { width: 65px; height: 65px; }
+        }
+        
+        @media print {
+            body * { visibility: hidden; }
+            .paper-sheet, .paper-sheet * { visibility: visible; }
+            .paper-sheet { position: absolute; top: 0; left: 0; width: 100%; }
+            .copy-badge { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🏥 MedCard Pro</h1>
+        <p class="subtitle">Sistema Profissional | Logo Ampliado | Copiar/Colar Instantâneo</p>
+    </header>
+    
+    <div class="main-content">
+        <div class="control-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title" style="margin-bottom: 0; border-bottom: none;">⚙️ Configurações</h2>
+                <button id="toggleSavedBtn" class="toggle-saved-cards-btn">📁 Cartões <span id="savedCount">(0)</span></button>
+            </div>
+            
+            <div class="form-group">
+                <label>📐 Layout A4</label>
+                <div class="layout-options">
+                    <div class="layout-option" data-layout="1">1</div>
+                    <div class="layout-option selected" data-layout="2">2</div>
+                    <div class="layout-option" data-layout="4">4</div>
+                    <div class="layout-option" data-layout="6">6</div>
+                    <div class="layout-option" data-layout="8">8</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>👤 Paciente Padrão</label>
+                <div class="field-input-container">
+                    <input type="text" id="globalPacient" value="Ana Carolina Mendes">
+                    <button class="field-save-btn" id="savePacientBtn">💾</button>
+                </div>
+                <div id="savedUsersList" class="saved-items-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>🏨 Hospital / Clínica</label>
+                <div class="field-input-container">
+                    <input type="text" id="globalHospital" value="Santa Bárbara Saúde">
+                    <button class="field-save-btn" id="saveHospitalBtn">💾</button>
+                </div>
+                <div id="savedHospitalsList" class="saved-items-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>🔬 Especialidade</label>
+                <select id="globalSpeciality">
+                    <option>Cardiologista</option><option>Dermatologista</option><option>Oftalmologista</option>
+                    <option>Ortopedista</option><option>Pediatra</option><option>Ginecologista</option>
+                    <option>Clínico Geral</option><option>Otorrinolaringologista</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>📍 Endereço</label>
+                <div class="field-input-container">
+                    <input type="text" id="globalAddress" value="Av. Dom João VI, 1291 - Brotas, Salvador - BA, 40285-000">
+                    <button class="field-save-btn" id="saveAddressBtn">💾</button>
+                </div>
+                <div id="savedAddressesList" class="saved-items-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>📅 Data</label>
+                <input type="date" id="globalDate" value="2026-04-15">
+            </div>
+            
+            <div class="form-group">
+                <label>⏰ Horário</label>
+                <input type="time" id="globalHour" value="10:30">
+            </div>
+            
+            <div class="form-group">
+                <label>🖼️ Logo Padrão (Ampliado)</label>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div id="logoPlaceholder" style="background: var(--gray-100); padding: 10px 20px; border-radius: 40px; cursor: pointer; border: 1px dashed var(--gray-300);">➕ Adicionar Logo</div>
+                    <img id="logoPreview" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px; display: none; border: 1px solid var(--gray-200);">
+                    <input type="file" id="logoUpload" accept="image/*" hidden>
+                    <button id="saveLogoBtn" class="button secondary" style="padding: 6px 16px;">💾 Salvar</button>
+                    <button id="removeLogoBtn" class="button danger" style="display: none;">Remover</button>
+                </div>
+                <div id="savedLogosList" class="saved-items-container"></div>
+            </div>
+            
+            <div class="actions">
+                <button id="applyAllBtn" class="button">✅ Aplicar a Todos</button>
+                <button id="saveSetBtn" class="button secondary">💾 Salvar Conjunto</button>
+                <button id="resetBtn" class="button danger">🔄 Redefinir</button>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <h2 class="section-title">📄 Pré-visualização A4</h2>
+            <div style="overflow-x: auto; text-align: center;">
+                <div class="paper-sheet">
+                    <div class="appointments-grid layout-2-cards" id="cardsGrid"></div>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="pdfBtn" class="button">📑 PDF</button>
+                <button id="printBtn" class="button secondary">🖨️ Imprimir</button>
+                <button id="imageBtn" class="button">🖼️ PNG</button>
+            </div>
+            <div style="margin-top: 16px; font-size: 0.75rem; color: var(--gray-600); text-align: center; background: var(--primary-light); padding: 10px; border-radius: 40px;">
+                💡 <strong>Copiar & Colar Instantâneo:</strong> Clique no badge 🟡 amarelo para copiar → depois clique em qualquer outro cartão para colar TODOS os dados (incluindo logo) instantaneamente!
+            </div>
+        </div>
+    </div>
+    
+    <div class="saved-cards-section" id="savedSection">
+        <h2 class="section-title">📦 Conjuntos Salvos</h2>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome, paciente ou hospital...">
+            <button id="searchBtn" class="button">🔍 Buscar</button>
+            <button id="clearSearchBtn" class="button danger">Limpar</button>
+        </div>
+        <div id="savedCardsList" class="saved-cards-container"></div>
+        <div class="actions" style="margin-top: 20px;">
+            <button id="clearAllSavedBtn" class="button danger">🗑️ Limpar Todos</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <h3 class="section-title" style="margin-top: 0;">✏️ Editar Cartão <span id="modalCardNum">1</span></h3>
+        <div class="form-group"><label>Paciente</label><input type="text" id="modalPacient"></div>
+        <div class="form-group"><label>Hospital</label><input type="text" id="modalHospital"></div>
+        <div class="form-group"><label>Especialidade</label><select id="modalSpeciality"></select></div>
+        <div class="form-group"><label>Data</label><input type="date" id="modalDate"></div>
+        <div class="form-group"><label>Horário</label><input type="time" id="modalHour"></div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="modalAddress"></div>
+        <div class="actions"><button id="modalSaveBtn" class="button secondary">Salvar</button><button id="modalCancelBtn" class="button danger">Cancelar</button></div>
+    </div>
+</div>
+
+<!-- Save Set Modal -->
+<div class="modal-overlay" id="saveSetModal">
+    <div class="modal-content">
+        <h3 class="section-title">💾 Salvar Conjunto</h3>
+        <div class="form-group"><label>Nome do Conjunto</label><input type="text" id="setName" placeholder="Ex: Consultas Abril 2026"></div>
+        <div class="actions"><button id="confirmSaveSetBtn" class="button secondary">Salvar</button><button id="cancelSaveSetBtn" class="button danger">Cancelar</button></div>
+    </div>
+</div>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    // ==================== STATE ====================
+    let currentLayout = 2;
+    let globalLogo = null;
+    let cardData = [];
+    let individualLogos = Array(8).fill(null);
+    let savedCards = [];
+    let savedAddresses = [], savedLogos = [], savedUsers = [], savedHospitals = [];
+    let currentEditIndex = -1;
+    let copiedCardBuffer = null;      // Stores copied card data
+    let copiedLogoBuffer = null;       // Stores copied logo separately
+    
+    // ==================== HELPERS ====================
+    function capitalize(str) { return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); }
+    function formatDateForDisplay(dateStr) { if(!dateStr) return ''; if(dateStr.includes('/')) return dateStr; const [y,m,d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
+    function formatDateForInput(dateStr) { if(!dateStr) return ''; if(dateStr.includes('-')) return dateStr; const [d,m,y] = dateStr.split('/'); return `${y}-${m}-${d}`; }
+    
+    function saveToStorage(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function loadFromStorage(key, def) { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; }
+    
+    function showMessage(msg, type = 'success') {
+        const div = document.createElement('div');
+        div.className = 'feedback-message';
+        div.style.background = type === 'error' ? '#e76f51' : type === 'warning' ? '#e9c46a' : '#2a9d8f';
+        div.innerText = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 2500);
+    }
+    
+    function showPasteIndicator(msg) {
+        const div = document.createElement('div');
+        div.className = 'paste-indicator';
+        div.innerText = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 1500);
+    }
+    
+    function saveAllData() {
+        saveToStorage('medAddresses', savedAddresses);
+        saveToStorage('medLogos', savedLogos);
+        saveToStorage('medUsers', savedUsers);
+        saveToStorage('medHospitals', savedHospitals);
+        saveToStorage('medCards', savedCards);
+        document.getElementById('savedCount').innerText = `(${savedCards.length})`;
+    }
+    
+    // ==================== RENDER CARDS WITH LARGER LOGO ====================
+    function renderCards() {
+        const grid = document.getElementById('cardsGrid');
+        const layoutClass = `layout-${currentLayout}-cards`;
+        grid.className = `appointments-grid ${layoutClass}`;
+        grid.innerHTML = '';
+        
+        for(let i = 0; i < currentLayout; i++) {
+            const d = cardData[i];
+            const logoUrl = individualLogos[i] || globalLogo;
+            grid.innerHTML += `
+                <div class="appointment-card" data-card-index="${i}">
+                    <div class="copy-badge" data-copy-index="${i}">📋</div>
+                    <div class="card-header">
+                        <div class="card-logo-container" data-logo-index="${i}">
+                            ${logoUrl ? `<img class="card-logo" src="${logoUrl}" alt="logo">` : '<span style="font-size: 42px;">🏥</span>'}
+                        </div>
+                        <div class="hospital-name">${d.hospital}</div>
+                    </div>
+                    <div class="card-title">AGENDAMENTO MÉDICO</div>
+                    <div class="appointment-details">
+                        <div class="detail-row"><span class="detail-label">Paciente:</span><span class="detail-value">${d.pacient}</span></div>
+                        <div class="detail-row"><span class="detail-label">Especialidade:</span><span class="detail-value">${d.speciality}</span></div>
+                        <div class="detail-row"><span class="detail-label">Data:</span><span class="detail-value">${d.date}</span></div>
+                        <div class="detail-row"><span class="detail-label">Horário:</span><span class="detail-value">${d.hour}</span></div>
+                        <div class="detail-row"><span class="detail-label">Local:</span><span class="detail-value">${d.address.length > 60 ? d.address.substring(0,57)+'...' : d.address}</span></div>
+                    </div>
+                    <div class="card-footer">✓ Chegar 15 minutos antes | Apresentar este cartão</div>
+                </div>
+            `;
+        }
+        
+        // Attach events after render
+        attachAllEvents();
+    }
+    
+    function attachAllEvents() {
+        // Copy badge click
+        document.querySelectorAll('.copy-badge').forEach(badge => {
+            badge.removeEventListener('click', badge._copyHandler);
+            badge._copyHandler = (e) => {
+                e.stopPropagation();
+                const idx = parseInt(badge.dataset.copyIndex);
+                copyCard(idx);
+            };
+            badge.addEventListener('click', badge._copyHandler);
+        });
+        
+        // Card click for paste or edit
+        document.querySelectorAll('.appointment-card').forEach(card => {
+            const idx = parseInt(card.dataset.cardIndex);
+            card.removeEventListener('click', card._clickHandler);
+            card._clickHandler = (e) => {
+                if(e.target.closest('.copy-badge')) return;
+                if(e.target.closest('.card-logo-container')) {
+                    uploadLogoForCard(idx);
+                    return;
+                }
+                // PASTE LOGIC: if buffer exists, paste instantly
+                if(copiedCardBuffer !== null) {
+                    pasteCardInstant(idx);
+                } else {
+                    openEditModal(idx);
+                }
+            };
+            card.addEventListener('click', card._clickHandler);
+        });
+        
+        // Logo container click
+        document.querySelectorAll('.card-logo-container').forEach(container => {
+            const idx = parseInt(container.dataset.logoIndex);
+            container.removeEventListener('click', container._logoHandler);
+            container._logoHandler = (e) => {
+                e.stopPropagation();
+                uploadLogoForCard(idx);
+            };
+            container.addEventListener('click', container._logoHandler);
+        });
+    }
+    
+    // ==================== COPY FUNCTION ====================
+    function copyCard(index) {
+        // Store full card data AND logo
+        copiedCardBuffer = { ...cardData[index] };
+        copiedLogoBuffer = individualLogos[index] || globalLogo;
+        
+        // Visual feedback on badge
+        const badge = document.querySelector(`.copy-badge[data-copy-index="${index}"]`);
+        if(badge) {
+            badge.classList.add('copied');
+            setTimeout(() => badge.classList.remove('copied'), 1200);
+        }
+        showMessage(`📋 Cartão ${index+1} copiado! Agora clique em qualquer outro cartão para colar instantaneamente.`, 'success');
+    }
+    
+    // ==================== PASTE FUNCTION - INSTANT UPDATE ====================
+    function pasteCardInstant(targetIndex) {
+        if(copiedCardBuffer === null) {
+            showMessage('Nada para colar. Copie um cartão primeiro (clique no badge amarelo).', 'warning');
+            return;
+        }
+        
+        // Update ALL card data instantly
+        cardData[targetIndex] = { ...copiedCardBuffer };
+        
+        // Update logo (individual or global)
+        if(copiedLogoBuffer) {
+            individualLogos[targetIndex] = copiedLogoBuffer;
+        } else {
+            individualLogos[targetIndex] = null;
+        }
+        
+        // Re-render to show updated card immediately
+        renderCards();
+        
+        // Show visual confirmation
+        showPasteIndicator(`✨ Cartão ${targetIndex+1} atualizado com os dados copiados!`);
+        showMessage(`✅ Dados colados no cartão ${targetIndex+1} (incluindo logo)`, 'success');
+        
+        // Optionally keep buffer for multiple pastes (user can paste to multiple cards)
+        // Buffer remains until new copy action
+    }
+    
+    function uploadLogoForCard(idx) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if(file && file.type.match('image')) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    individualLogos[idx] = ev.target.result;
+                    renderCards();
+                    showMessage('Logo adicionado ao cartão!');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    }
+    
+    function openEditModal(idx) {
+        currentEditIndex = idx;
+        const d = cardData[idx];
+        document.getElementById('modalCardNum').innerText = idx+1;
+        document.getElementById('modalPacient').value = d.pacient;
+        document.getElementById('modalHospital').value = d.hospital;
+        document.getElementById('modalSpeciality').value = d.speciality;
+        document.getElementById('modalDate').value = formatDateForInput(d.date);
+        document.getElementById('modalHour').value = d.hour;
+        document.getElementById('modalAddress').value = d.address;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    
+    function saveModalEdit() {
+        if(currentEditIndex === -1) return;
+        cardData[currentEditIndex] = {
+            pacient: capitalize(document.getElementById('modalPacient').value),
+            hospital: capitalize(document.getElementById('modalHospital').value),
+            speciality: document.getElementById('modalSpeciality').value,
+            date: formatDateForDisplay(document.getElementById('modalDate').value),
+            hour: document.getElementById('modalHour').value,
+            address: capitalize(document.getElementById('modalAddress').value)
+        };
+        renderCards();
+        document.getElementById('editModal').style.display = 'none';
+        currentEditIndex = -1;
+        showMessage('Cartão atualizado!');
+    }
+    
+    function applyGlobalToAll() {
+        const pacient = capitalize(document.getElementById('globalPacient').value);
+        const hospital = capitalize(document.getElementById('globalHospital').value);
+        const speciality = document.getElementById('globalSpeciality').value;
+        const address = capitalize(document.getElementById('globalAddress').value);
+        const date = formatDateForDisplay(document.getElementById('globalDate').value);
+        const hour = document.getElementById('globalHour').value;
+        for(let i=0; i<currentLayout; i++) {
+            cardData[i].pacient = pacient;
+            cardData[i].hospital = hospital;
+            cardData[i].speciality = speciality;
+            cardData[i].address = address;
+            cardData[i].date = date;
+            cardData[i].hour = hour;
+        }
+        renderCards();
+        showMessage(`Aplicado a ${currentLayout} cartões!`);
+    }
+    
+    function resetAll() {
+        if(confirm('Redefinir todos os cartões?')) {
+            for(let i=0; i<8; i++) {
+                cardData[i] = {
+                    pacient: "Ana Carolina Mendes",
+                    hospital: "Santa Bárbara Saúde",
+                    speciality: "Cardiologista",
+                    date: "15/04/2026",
+                    hour: "10:30",
+                    address: "Av. Dom João VI, 1291 - Brotas, Salvador - BA, 40285-000"
+                };
+            }
+            individualLogos.fill(null);
+            globalLogo = null;
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('logoPlaceholder').style.display = 'block';
+            document.getElementById('removeLogoBtn').style.display = 'none';
+            renderCards();
+            showMessage('Tudo redefinido!');
+        }
+    }
+    
+    // ==================== SAVE/LOAD CARDS ====================
+    function saveCurrentSet() {
+        const name = document.getElementById('setName').value.trim();
+        if(!name) { showMessage('Digite um nome', 'warning'); return; }
+        const cardSet = {
+            id: Date.now(),
+            name: name,
+            layout: currentLayout,
+            timestamp: new Date().toISOString(),
+            globalLogo: globalLogo,
+            individualLogos: [...individualLogos],
+            cards: cardData.slice(0, currentLayout).map(c => ({...c}))
+        };
+        savedCards.unshift(cardSet);
+        if(savedCards.length > 50) savedCards.pop();
+        saveAllData();
+        renderSavedCardsList();
+        document.getElementById('saveSetModal').style.display = 'none';
+        document.getElementById('setName').value = '';
+        showMessage(`"${name}" salvo!`);
+    }
+    
+    function renderSavedCardsList(filter = '') {
+        const container = document.getElementById('savedCardsList');
+        let filtered = savedCards;
+        if(filter) {
+            const term = filter.toLowerCase();
+            filtered = savedCards.filter(c => c.name.toLowerCase().includes(term) || 
+                c.cards.some(cd => cd.pacient.toLowerCase().includes(term) || cd.hospital.toLowerCase().includes(term)));
+        }
+        if(!filtered.length) { container.innerHTML = '<div style="text-align:center;padding:40px;">Nenhum conjunto salvo</div>'; return; }
+        container.innerHTML = filtered.map(card => `
+            <div class="saved-card-item" data-id="${card.id}">
+                <div class="saved-card-header" style="display:flex;justify-content:space-between;"><span style="font-weight:700;">${card.name}</span><span style="font-size:0.7rem;">${new Date(card.timestamp).toLocaleDateString()}</span></div>
+                <div style="margin:8px 0;">📋 ${card.layout} cartões | 👤 ${card.cards.length} pacientes</div>
+                <div class="saved-card-actions"><button class="saved-card-btn load" data-id="${card.id}">Carregar</button><button class="saved-card-btn delete" data-id="${card.id}">Excluir</button></div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.saved-card-btn.load').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); loadCardSet(btn.dataset.id); }));
+        document.querySelectorAll('.saved-card-btn.delete').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); deleteCardSet(btn.dataset.id); }));
+    }
+    
+    function loadCardSet(id) {
+        const set = savedCards.find(c => c.id == id);
+        if(!set) return;
+        if(confirm(`Carregar "${set.name}"?`)) {
+            currentLayout = set.layout;
+            document.querySelectorAll('.layout-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`.layout-option[data-layout="${currentLayout}"]`).classList.add('selected');
+            globalLogo = set.globalLogo;
+            if(globalLogo) { document.getElementById('logoPreview').src = globalLogo; document.getElementById('logoPreview').style.display = 'block'; document.getElementById('logoPlaceholder').style.display = 'none'; document.getElementById('removeLogoBtn').style.display = 'inline-block'; }
+            else { document.getElementById('logoPreview').style.display = 'none'; document.getElementById('logoPlaceholder').style.display = 'block'; document.getElementById('removeLogoBtn').style.display = 'none'; }
+            individualLogos = [...set.individualLogos];
+            for(let i=0; i<set.cards.length; i++) cardData[i] = {...set.cards[i]};
+            renderCards();
+            showMessage(`"${set.name}" carregado!`);
+        }
+    }
+    
+    function deleteCardSet(id) { savedCards = savedCards.filter(c => c.id != id); saveAllData(); renderSavedCardsList(); showMessage('Removido!'); }
+    function clearAllSaved() { if(confirm('Excluir TODOS?')) { savedCards = []; saveAllData(); renderSavedCardsList(); showMessage('Todos removidos'); } }
+    
+    // PDF/Image
+    async function generatePDF() {
+        const sheet = document.querySelector('.paper-sheet');
+        const badges = document.querySelectorAll('.copy-badge');
+        badges.forEach(b => b.style.display = 'none');
+        const canvas = await html2canvas(sheet, { scale: 2 });
+        badges.forEach(b => b.style.display = 'flex');
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfW = pdf.internal.pageSize.getWidth();
+        const pdfH = (canvas.height * pdfW) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+        pdf.save(`agendamentos.pdf`);
+        showMessage('PDF gerado!');
+    }
+    async function downloadImage() {
+        const sheet = document.querySelector('.paper-sheet');
+        const badges = document.querySelectorAll('.copy-badge');
+        badges.forEach(b => b.style.display = 'none');
+        const canvas = await html2canvas(sheet, { scale: 2 });
+        badges.forEach(b => b.style.display = 'flex');
+        const link = document.createElement('a');
+        link.download = 'cartoes.png';
+        link.href = canvas.toDataURL();
+        link.click();
+        showMessage('Imagem salva!');
+    }
+    function printPreview() { window.print(); }
+    
+    // ==================== INIT ====================
+    function init() {
+        savedAddresses = loadFromStorage('medAddresses', []);
+        savedLogos = loadFromStorage('medLogos', []);
+        savedUsers = loadFromStorage('medUsers', [{id:1,name:"Ana Carolina Mendes",fullName:"Ana Carolina Mendes"}]);
+        savedHospitals = loadFromStorage('medHospitals', [{id:1,name:"Santa Bárbara Saúde",hospitalName:"Santa Bárbara Saúde"}]);
+        savedCards = loadFromStorage('medCards', []);
+        for(let i=0;i<8;i++) cardData[i] = { pacient:"Ana Carolina Mendes", hospital:"Santa Bárbara Saúde", speciality:"Cardiologista", date:"15/04/2026", hour:"10:30", address:"Av. Dom João VI, 1291 - Brotas, Salvador - BA" };
+        renderCards();
+        renderSavedCardsList();
+        document.getElementById('savedCount').innerText = `(${savedCards.length})`;
+        const opts = ['Cardiologista','Dermatologista','Oftalmologista','Ortopedista','Pediatra','Ginecologista','Clínico Geral','Otorrinolaringologista'];
+        document.getElementById('globalSpeciality').innerHTML = opts.map(o => `<option>${o}</option>`).join('');
+        document.getElementById('modalSpeciality').innerHTML = opts.map(o => `<option>${o}</option>`).join('');
+    }
+    
+    // Event listeners
+    document.querySelectorAll('.layout-option').forEach(opt => opt.addEventListener('click', function() {
+        document.querySelectorAll('.layout-option').forEach(o=>o.classList.remove('selected'));
+        this.classList.add('selected');
+        currentLayout = parseInt(this.dataset.layout);
+        renderCards();
+    }));
+    document.getElementById('applyAllBtn').addEventListener('click', applyGlobalToAll);
+    document.getElementById('saveSetBtn').addEventListener('click', () => document.getElementById('saveSetModal').style.display = 'flex');
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+    document.getElementById('pdfBtn').addEventListener('click', generatePDF);
+    document.getElementById('printBtn').addEventListener('click', printPreview);
+    document.getElementById('imageBtn').addEventListener('click', downloadImage);
+    
+    document.getElementById('logoPlaceholder').addEventListener('click', () => document.getElementById('logoUpload').click());
+    document.getElementById('logoUpload').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if(file && file.type.match('image')) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { globalLogo = ev.target.result; document.getElementById('logoPreview').src = globalLogo; document.getElementById('logoPreview').style.display = 'block'; document.getElementById('logoPlaceholder').style.display = 'none'; document.getElementById('removeLogoBtn').style.display = 'inline-block'; renderCards(); showMessage('Logo global adicionado!'); };
+            reader.readAsDataURL(file);
+        }
+    });
+    document.getElementById('removeLogoBtn').addEventListener('click', () => { globalLogo = null; document.getElementById('logoPreview').style.display = 'none'; document.getElementById('logoPlaceholder').style.display = 'block'; document.getElementById('removeLogoBtn').style.display = 'none'; renderCards(); });
+    document.getElementById('saveLogoBtn').addEventListener('click', () => { if(globalLogo) { savedLogos.push({id:Date.now(), name:"Logo", dataURL:globalLogo}); saveToStorage('medLogos', savedLogos); showMessage('Logo salvo!'); } });
+    document.getElementById('savePacientBtn').addEventListener('click', () => { const v = document.getElementById('globalPacient').value; if(v) { savedUsers.push({id:Date.now(), name:v, fullName:v}); saveToStorage('medUsers', savedUsers); showMessage('Salvo!'); } });
+    document.getElementById('saveHospitalBtn').addEventListener('click', () => { const v = document.getElementById('globalHospital').value; if(v) { savedHospitals.push({id:Date.now(), name:v, hospitalName:v}); saveToStorage('medHospitals', savedHospitals); showMessage('Salvo!'); } });
+    document.getElementById('saveAddressBtn').addEventListener('click', () => { const v = document.getElementById('globalAddress').value; if(v) { savedAddresses.push({id:Date.now(), name:v.substring(0,30), address:v}); saveToStorage('medAddresses', savedAddresses); showMessage('Salvo!'); } });
+    
+    document.getElementById('modalSaveBtn').addEventListener('click', saveModalEdit);
+    document.getElementById('modalCancelBtn').addEventListener('click', () => document.getElementById('editModal').style.display = 'none');
+    document.getElementById('confirmSaveSetBtn').addEventListener('click', saveCurrentSet);
+    document.getElementById('cancelSaveSetBtn').addEventListener('click', () => document.getElementById('saveSetModal').style.display = 'none');
+    document.getElementById('toggleSavedBtn').addEventListener('click', () => { document.getElementById('savedSection').classList.toggle('active'); document.getElementById('toggleSavedBtn').classList.toggle('active'); });
+    document.getElementById('clearAllSavedBtn').addEventListener('click', clearAllSaved);
+    document.getElementById('searchBtn').addEventListener('click', () => renderSavedCardsList(document.getElementById('searchInput').value));
+    document.getElementById('clearSearchBtn').addEventListener('click', () => { document.getElementById('searchInput').value = ''; renderSavedCardsList(); });
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); } });
+    
+    init();
+</script>
+</body>
+</html>
