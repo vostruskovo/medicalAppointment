@@ -948,6 +948,36 @@
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+
+
+    function capitalizeArray(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    arr[i] = arr[i]
+      .split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+  }
+}
+
+
+Array.prototype.capitalizeArray = function() {
+  for (let i = 0; i < this.length; i++) {
+    this[i] = this[i]
+      .split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+  }
+};
+
+
+// Exemplo de uso:
+/*
+let opts = ['cardiologista','dermatologista','clínico geral'];
+capitalizeArray(opts);
+console.log(opts);
+*/
+// ["Cardiologista", "Dermatologista", "Clínico Geral"]
+
     // ==================== STATE ====================
     let currentLayout = 2;
     let globalLogo = null;
@@ -1536,7 +1566,11 @@
         renderSavedCardsList();
         renderGlobalSavedItems();
         document.getElementById('savedCount').innerText = `(${savedCards.length})`;
-        const opts = ['Cardiologista','Dermatologista','Oftalmologista','Ortopedista','Pediatra','Ginecologista','Clínico Geral','Otorrinolaringologista','Neurologista'];
+        const opts = ['Cardiologista','Dermatologista','Oftalmologista','Ortopedista','Pediatra','Ginecologista','clínico ceral','otorrinolaringologista','Neurologista','urologia','ultrassonografia'];
+        opts.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+        opts.capitalizeArray();
+        //capitalizeArray(opts);
+        //capitalizeArray
         document.getElementById('globalSpeciality').innerHTML = opts.map(o => `<option>${o}</option>`).join('');
         document.getElementById('modalSpeciality').innerHTML = opts.map(o => `<option>${o}</option>`).join('');
         
