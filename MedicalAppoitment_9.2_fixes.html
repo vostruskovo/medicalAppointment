@@ -610,7 +610,38 @@
     });
     
     // ==================== CORE DATA ====================
-    const specialties = ['Cardiologista', 'Dermatologista', 'Oftalmologista', 'Ortopedista', 'Pediatra', 'Ginecologista', 'Clínico Geral', 'Otorrino', 'Neurologista', 'Urologia', 'Endocrinologista'];
+
+    function capitalizeArray(arr) {
+  if (!Array.isArray(arr)) return [];
+
+  for (let i = 0; i < arr.length; i++) {
+    let w = arr[i];
+    arr[i] = w
+      .split(' ')
+      .map(part => part[0].toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  return arr; // optional, since the array is already modified
+}
+
+
+
+Array.prototype.capitalizeArray02 = function() {
+  this.forEach((w, i, arr) => {
+    arr[i] = w
+      .split(' ')
+      .map(part => part[0].toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
+  });
+  return this; // return the array for chaining
+};
+
+    const specialties = ['Cardiologista', 'Dermatologista', 'Oftalmologista', 'Ortopedista', 'Pediatra', 'Ginecologista', 'Clínico Geral', 'Otorrino', 'Neurologista', 'Urologia', 'Endocrinologista','ultrassonografista'];
+    specialties.sort();
+capitalizeArray(specialties);
+
+
     let currentLayout = 2, globalLogo = null, cardData = [], individualLogos = Array(8).fill(null);
     let savedCards = [], savedUsers = [], savedHospitals = [];
     let currentEditIndex = -1, isSelectingFromDropdown = false;
