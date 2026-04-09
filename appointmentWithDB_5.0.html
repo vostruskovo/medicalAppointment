@@ -836,11 +836,49 @@
     }
     
     async function deleteSavedItem(type, id) {
-        if(type === 'user') { db.savedUsers = db.savedUsers.filter(u => u.id !== id); await saveDb(); showMessage('Paciente removido'); }
-        else if(type === 'hospital') { db.savedHospitals = db.savedHospitals.filter(h => h.id !== id); await saveDb(); showMessage('Hospital removido'); }
-        renderGlobalSavedItems();
-        renderCards();
+    if(type === 'user') {
+        const userToDelete = db.savedUsers.find(u => u.id === id);
+        const userNameToDelete = userToDelete ? userToDelete.fullName : null;
+        
+        db.savedUsers = db.savedUsers.filter(u => u.id !== id);
+        await saveDb();
+        
+        // Remove this patient from all appointment cards
+        if(userNameToDelete) {
+            for(let i = 0; i < cardData.length; i++) {
+                if(cardData[i] && cardData[i].pacient === userNameToDelete) {
+                    cardData[i].pacient = '';
+                }
+            }
+            renderCards();
+        }
+        
+        showMessage('Paciente removido');
+    } 
+    else if(type === 'hospital') {
+        const hospitalToDelete = db.savedHospitals.find(h => h.id === id);
+        const hospitalNameToDelete = hospitalToDelete ? hospitalToDelete.hospitalName : null;
+        
+        db.savedHospitals = db.savedHospitals.filter(h => h.id !== id);
+        await saveDb();
+        
+        // Remove this hospital from all appointment cards
+        if(hospitalNameToDelete) {
+            for(let i = 0; i < cardData.length; i++) {
+                if(cardData[i] && (cardData[i].hospitalFullValue === hospitalNameToDelete || cardData[i].hospital === hospitalToDelete?.alias)) {
+                    cardData[i].hospital = '';
+                    cardData[i].hospitalFullValue = '';
+                }
+            }
+            renderCards();
+        }
+        
+        showMessage('Hospital removido');
     }
+    
+    renderGlobalSavedItems();
+    renderCards();
+}
     
     function renderGlobalSavedItems() {
         const usersDiv = document.getElementById('savedUsersList');
@@ -990,40 +1028,56 @@
     }
     
     function saveAndApplyUser() {
-        let v = document.getElementById('globalPacient').value;
-        if(v) {
-            v = capitalize(v);
-            const existing = db.savedUsers.find(u => u.fullName === v);
-            if(existing) {
-                applyToAllCards('pacient', v);
-                document.getElementById('globalPacient').value = '';
-                showMessage(`✅ Paciente aplicado!`);
-            } else {
-                document.getElementById('saveItemAlias').value = '';
-                document.getElementById('saveItemValue').value = v;
-                document.getElementById('saveItemModal').style.display = 'flex';
-                pendingSaveType = 'user';
-            }
+    let v = document.getElementById('globalPacient').value;
+    if(v) {
+        v = capitalize(v);
+        const existing = db.savedUsers.find(u => u.fullName === v);
+        if(existing) {
+            applyToAllCards('pacient', v);
+            document.getElementById('globalPacient').value = '';
+            showMessage(`✅ Paciente aplicado!`);
+            document.getElementById('globalHospital').focus();
+        } else {
+            document.getElementById('saveItemAlias').value = '';
+            document.getElementById('saveItemValue').value = v;
+            document.getElementById('saveItemModal').style.display = 'flex';
+            pendingSaveType = 'user';
+            // Fix: Use setTimeout to ensure focus works after modal is rendered
+            setTimeout(() => {
+                const aliasInput = document.getElementById('saveItemAlias');
+                if(aliasInput) {
+                    aliasInput.focus();
+                }
+            }, 100);
         }
     }
+}
     
     function saveAndApplyHospital() {
-        let v = document.getElementById('globalHospital').value;
-        if(v) {
-            const existing = db.savedHospitals.find(h => h.hospitalName === v);
-            if(existing) {
-                applyToAllCards('hospital', existing.alias);
-                applyToAllCards('hospitalFullValue', v);
-                document.getElementById('globalHospital').value = '';
-                showMessage(`✅ Hospital aplicado!`);
-            } else {
-                document.getElementById('saveItemAlias').value = '';
-                document.getElementById('saveItemValue').value = v;
-                document.getElementById('saveItemModal').style.display = 'flex';
-                pendingSaveType = 'hospital';
-            }
+    let v = document.getElementById('globalHospital').value;
+    if(v) {
+        const existing = db.savedHospitals.find(h => h.hospitalName === v);
+        if(existing) {
+            applyToAllCards('hospital', existing.alias);
+            applyToAllCards('hospitalFullValue', v);
+            document.getElementById('globalHospital').value = '';
+            showMessage(`✅ Hospital aplicado!`);
+            document.getElementById('globalPacient').focus();
+        } else {
+            document.getElementById('saveItemAlias').value = '';
+            document.getElementById('saveItemValue').value = v;
+            document.getElementById('saveItemModal').style.display = 'flex';
+            pendingSaveType = 'hospital';
+            // Fix: Use setTimeout to ensure focus works after modal is rendered
+            setTimeout(() => {
+                const aliasInput = document.getElementById('saveItemAlias');
+                if(aliasInput) {
+                    aliasInput.focus();
+                }
+            }, 100);
         }
     }
+}
     
     async function confirmSaveItem() {
         const alias = document.getElementById('saveItemAlias').value.trim();
@@ -1201,27 +1255,57 @@
         });
     }
     
-    function showPasswordPrompt() {
-        const overlay = document.createElement('div');
-        overlay.className = 'password-prompt';
-        overlay.innerHTML = `
-            <div class="password-box">
-                <h2 style="color:var(--primary);">🔐 MedCard Pro v24</h2>
-                <p style="margin:16px 0;">Segurança máxima: WebCrypto AES-GCM + PBKDF2 (100k iterações)</p>
-                <p style="margin:8px 0; font-size:0.8rem; color:var(--gray-600);">Nenhuma senha é armazenada. Apenas você sabe sua senha!</p>
-                <input type="password" id="pwdInput" placeholder="Digite sua senha" style="width:100%;margin-bottom:16px;padding:12px;border-radius:10px;border:1px solid #ccc;">
-                <button id="unlockBtn" class="button secondary" style="width:100%;">🔓 Desbloquear</button>
-                <button id="newDbBtn" class="button" style="width:100%;margin-top:12px;">🆕 Criar Novo Banco de Dados</button>
-                <div class="security-badge">
-                    🔒 AES-256-GCM | PBKDF2-SHA256 | 100,000 iterações | Salt aleatório
-                </div>
+function showPasswordPrompt() {
+    const overlay = document.createElement('div');
+    overlay.className = 'password-prompt';
+    overlay.innerHTML = `
+        <div class="password-box">
+            <h2 style="color:var(--primary);">🔐 MedCard Pro v24</h2>
+            <p style="margin:16px 0;">Segurança máxima: WebCrypto AES-GCM + PBKDF2 (100k iterações)</p>
+            <p style="margin:8px 0; font-size:0.8rem; color:var(--gray-600);">Nenhuma senha é armazenada. Apenas você sabe sua senha!</p>
+            <input type="password" id="pwdInput" placeholder="Digite sua senha" style="width:100%;margin-bottom:16px;padding:12px;border-radius:10px;border:1px solid #ccc;">
+            <button id="unlockBtn" class="button secondary" style="width:100%;">🔓 Desbloquear</button>
+            <button id="newDbBtn" class="button" style="width:100%;margin-top:12px;">🆕 Criar Novo Banco de Dados</button>
+            <div class="security-badge">
+                🔒 AES-256-GCM | PBKDF2-SHA256 | 100,000 iterações | Salt aleatório
             </div>
-        `;
-        document.body.appendChild(overlay);
-        
-        document.getElementById('unlockBtn').onclick = async () => {
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    // Fix: Use setTimeout to ensure focus works after DOM is ready
+    setTimeout(() => {
+        const pwdInput = document.getElementById('pwdInput');
+        if(pwdInput) {
+            pwdInput.focus();
+        }
+    }, 100);
+    
+    document.getElementById('unlockBtn').onclick = async () => {
+        const password = document.getElementById('pwdInput').value;
+        if (!password) { alert('Digite uma senha'); return; }
+        try {
+            const salt = getStoredSalt();
+            if (!salt) throw new Error('Database corrompido');
+            await loadDb(password, salt);
+            overlay.remove();
+            initApp();
+            showMessage('✅ Banco desbloqueado com sucesso!');
+        } catch(e) {
+            alert('❌ Senha incorreta!');
+            const pwdInput = document.getElementById('pwdInput');
+            pwdInput.value = '';
+            setTimeout(() => {
+                pwdInput.focus();
+            }, 50);
+        }
+    };
+    
+    document.getElementById('pwdInput').addEventListener('keydown', async function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
             const password = document.getElementById('pwdInput').value;
-            if (!password) { alert('Digite uma senha'); return; }
+            if (!password) return;
             try {
                 const salt = getStoredSalt();
                 if (!salt) throw new Error('Database corrompido');
@@ -1231,47 +1315,34 @@
                 showMessage('✅ Banco desbloqueado com sucesso!');
             } catch(e) {
                 alert('❌ Senha incorreta!');
-                document.getElementById('pwdInput').value = '';
+                const pwdInput = document.getElementById('pwdInput');
+                pwdInput.value = '';
+                setTimeout(() => {
+                    pwdInput.focus();
+                }, 50);
             }
-        };
-        
-        document.getElementById('pwdInput').addEventListener('keydown', async function(e) {
-            if (e.key === 'Enter') {
-                const password = document.getElementById('pwdInput').value;
-                if (!password) return;
-                try {
-                    const salt = getStoredSalt();
-                    if (!salt) throw new Error('Database corrompido');
-                    await loadDb(password, salt);
-                    overlay.remove();
-                    initApp();
-                    showMessage('✅ Banco desbloqueado com sucesso!');
-                } catch(e) {
-                    alert('❌ Senha incorreta!');
-                    document.getElementById('pwdInput').value = '';
-                }
-            }
-        });
-        
-        document.getElementById('newDbBtn').onclick = async () => {
-            const password = prompt('🔐 CRIAR NOVO BANCO\n\nDigite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA! Sem ela você NUNCA mais terá acesso aos seus dados!');
-            if (password && password.length >= 4) {
-                const confirmPwd = prompt('Confirme a senha:');
-                if (password === confirmPwd) {
-                    await createNewDb(password);
-                    overlay.remove();
-                    initApp();
-                    showMessage('✅ Novo banco de dados criado com segurança máxima!');
-                } else { alert('Senhas não coincidem!'); }
-            } else { alert('Senha deve ter no mínimo 4 caracteres!'); }
-        };
-    }
+        }
+    });
     
-    if (databaseExists()) {
-        showPasswordPrompt();
-    } else {
-        showPasswordPrompt();
-    }
+    document.getElementById('newDbBtn').onclick = async () => {
+        const password = prompt('🔐 CRIAR NOVO BANCO\n\nDigite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA! Sem ela você NUNCA mais terá acesso aos seus dados!');
+        if (password && password.length >= 4) {
+            const confirmPwd = prompt('Confirme a senha:');
+            if (password === confirmPwd) {
+                await createNewDb(password);
+                overlay.remove();
+                initApp();
+                showMessage('✅ Novo banco de dados criado com segurança máxima!');
+            } else { alert('Senhas não coincidem!'); }
+        } else { alert('Senha deve ter no mínimo 4 caracteres!'); }
+    };
+}
+
+if (databaseExists()) {
+    showPasswordPrompt();
+} else {
+    showPasswordPrompt();
+}
 
 
     /**/
@@ -1296,6 +1367,11 @@ trigger.addEventListener('keydown', function(event) {
         });
     }
 });
+
+
+
+
+
 </script>
 </body>
 </html>
