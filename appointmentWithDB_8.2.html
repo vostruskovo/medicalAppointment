@@ -339,132 +339,6 @@
             .copy-badge, .language-switcher { display: none; }
             .appointment-card { page-break-inside: avoid; break-inside: avoid; }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /* A4 print/capture sizing */
-@media print, screen {
-    .paper-sheet {
-        width: 21cm;
-        min-height: 29.7cm;
-        margin: 0 auto;
-        background: white;
-        box-sizing: border-box;
-    }
-    
-    /* Layout 2 cards (2 rows x 1 col) */
-    .layout-2-cards {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        padding: 0;
-    }
-    .layout-2-cards .appointment-card {
-        height: 14.85cm; /* 29.7 / 2 */
-        page-break-inside: avoid;
-        break-inside: avoid;
-        box-sizing: border-box;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    /* Layout 4 cards (2 rows x 2 cols) */
-    .layout-4-cards {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0;
-        padding: 0;
-    }
-    .layout-4-cards .appointment-card {
-        height: 14.85cm; /* 29.7 / 2 */
-        box-sizing: border-box;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    /* Layout 6 cards (3 rows x 2 cols) */
-    .layout-6-cards {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0;
-        padding: 0;
-    }
-    .layout-6-cards .appointment-card {
-        height: 9.9cm; /* 29.7 / 3 */
-        box-sizing: border-box;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    /* Layout 8 cards (4 rows x 2 cols) */
-    .layout-8-cards {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0;
-        padding: 0;
-    }
-    .layout-8-cards .appointment-card {
-        height: 7.425cm; /* 29.7 / 4 */
-        box-sizing: border-box;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    /* Card content scaling for smaller cards */
-    .layout-6-cards .appointment-card .detail-row,
-    .layout-8-cards .appointment-card .detail-row {
-        font-size: 0.7rem;
-        padding: 2px 0;
-    }
-    
-    .layout-6-cards .appointment-card .detail-label,
-    .layout-8-cards .appointment-card .detail-label {
-        min-width: 60px;
-        font-size: 0.65rem;
-    }
-    
-    .layout-6-cards .appointment-card .card-logo-container,
-    .layout-8-cards .appointment-card .card-logo-container {
-        width: 120px;
-        height: 50px;
-    }
-    
-    .layout-6-cards .appointment-card .hospital-name,
-    .layout-8-cards .appointment-card .hospital-name {
-        font-size: 0.7rem;
-        margin-left: 20px;
-    }
-    
-    .layout-8-cards .appointment-card {
-        padding: 8px;
-    }
-    
-    .layout-8-cards .appointment-details {
-        gap: 4px;
-    }
-}
     </style>
 </head>
 <body>
@@ -768,7 +642,7 @@
         return true;
     }
     
-    // Create new database
+    // Create new database with 2 default cards
     async function createNewDb(password) {
         // Generate random salt (32 bytes)
         const salt = crypto.getRandomValues(new Uint8Array(32));
@@ -776,8 +650,19 @@
         // Derive key from password + salt
         const key = await deriveKey(password, salt);
         
-        // Create empty database
-        db = { savedUsers: [], savedHospitals: [], savedCards: [], globalLogo: null, settings: { lastLayout: 2 } };
+        // Create empty database with default cards pre-filled for 2-card layout
+        db = { 
+            savedUsers: [], 
+            savedHospitals: [], 
+            savedCards: [], 
+            globalLogo: null, 
+            settings: { lastLayout: 2 },
+            // Pre-configure default cards for 2-card layout (empty but ready)
+            defaultCards: [
+                { pacient: "", hospital: "", hospitalFullValue: "", speciality: "", date: "", hour: "" },
+                { pacient: "", hospital: "", hospitalFullValue: "", speciality: "", date: "", hour: "" }
+            ]
+        };
         
         // Encrypt and save
         const encrypted = await encryptData(db, key);
@@ -829,6 +714,14 @@
         localStorage.setItem('medcard_encrypted_v2', importObj.data);
         localStorage.setItem('medcard_salt', importObj.salt);
         return true;
+    }
+    
+    // Save default cards (current 2 cards become the default)
+    async function saveDefaultCards() {
+        if (!cryptoKey) return;
+        // Save only the cards for the current layout (first 2 cards)
+        db.defaultCards = cardData.slice(0, 2).map(c => c ? { ...c } : {});
+        await saveDb();
     }
     
     // ==================== CORE APP ====================
@@ -962,49 +855,49 @@
     }
     
     async function deleteSavedItem(type, id) {
-    if(type === 'user') {
-        const userToDelete = db.savedUsers.find(u => u.id === id);
-        const userNameToDelete = userToDelete ? userToDelete.fullName : null;
-        
-        db.savedUsers = db.savedUsers.filter(u => u.id !== id);
-        await saveDb();
-        
-        // Remove this patient from all appointment cards
-        if(userNameToDelete) {
-            for(let i = 0; i < cardData.length; i++) {
-                if(cardData[i] && cardData[i].pacient === userNameToDelete) {
-                    cardData[i].pacient = '';
+        if(type === 'user') {
+            const userToDelete = db.savedUsers.find(u => u.id === id);
+            const userNameToDelete = userToDelete ? userToDelete.fullName : null;
+            
+            db.savedUsers = db.savedUsers.filter(u => u.id !== id);
+            await saveDb();
+            
+            // Remove this patient from all appointment cards
+            if(userNameToDelete) {
+                for(let i = 0; i < cardData.length; i++) {
+                    if(cardData[i] && cardData[i].pacient === userNameToDelete) {
+                        cardData[i].pacient = '';
+                    }
                 }
+                renderCards();
             }
-            renderCards();
+            
+            showMessage('Paciente removido');
+        } 
+        else if(type === 'hospital') {
+            const hospitalToDelete = db.savedHospitals.find(h => h.id === id);
+            const hospitalNameToDelete = hospitalToDelete ? hospitalToDelete.hospitalName : null;
+            
+            db.savedHospitals = db.savedHospitals.filter(h => h.id !== id);
+            await saveDb();
+            
+            // Remove this hospital from all appointment cards
+            if(hospitalNameToDelete) {
+                for(let i = 0; i < cardData.length; i++) {
+                    if(cardData[i] && (cardData[i].hospitalFullValue === hospitalNameToDelete || cardData[i].hospital === hospitalToDelete?.alias)) {
+                        cardData[i].hospital = '';
+                        cardData[i].hospitalFullValue = '';
+                    }
+                }
+                renderCards();
+            }
+            
+            showMessage('Hospital removido');
         }
         
-        showMessage('Paciente removido');
-    } 
-    else if(type === 'hospital') {
-        const hospitalToDelete = db.savedHospitals.find(h => h.id === id);
-        const hospitalNameToDelete = hospitalToDelete ? hospitalToDelete.hospitalName : null;
-        
-        db.savedHospitals = db.savedHospitals.filter(h => h.id !== id);
-        await saveDb();
-        
-        // Remove this hospital from all appointment cards
-        if(hospitalNameToDelete) {
-            for(let i = 0; i < cardData.length; i++) {
-                if(cardData[i] && (cardData[i].hospitalFullValue === hospitalNameToDelete || cardData[i].hospital === hospitalToDelete?.alias)) {
-                    cardData[i].hospital = '';
-                    cardData[i].hospitalFullValue = '';
-                }
-            }
-            renderCards();
-        }
-        
-        showMessage('Hospital removido');
+        renderGlobalSavedItems();
+        renderCards();
     }
-    
-    renderGlobalSavedItems();
-    renderCards();
-}
     
     function renderGlobalSavedItems() {
         const usersDiv = document.getElementById('savedUsersList');
@@ -1114,7 +1007,7 @@
         document.getElementById('editModal').style.display = 'flex';
     }
     
-    function saveModalEdit() {
+    async function saveModalEdit() {
         if(isSelectingFromDropdown) { isSelectingFromDropdown = false; return; }
         if(currentEditIndex === -1) return;
         cardData[currentEditIndex] = {
@@ -1126,6 +1019,7 @@
             hour: document.getElementById('modalHour').value
         };
         renderCards();
+        await saveDefaultCards();
         document.getElementById('editModal').style.display = 'none';
         currentEditIndex = -1;
         showMessage('Cartão atualizado!');
@@ -1133,7 +1027,7 @@
     
     function applyToAllCards(field, value) { for(let i=0;i<currentLayout;i++){if(!cardData[i])cardData[i]={};cardData[i][field]=value;} renderCards(); }
     
-    function resetAll() {
+    async function resetAll() {
         const hosp = document.getElementById('globalHospital').value;
         const pac = capitalize(document.getElementById('globalPacient').value);
         const spec = document.getElementById('global-speciality').value;
@@ -1150,60 +1044,61 @@
         }
         individualLogos.fill(null);
         renderCards();
+        await saveDefaultCards();
         showMessage('Cards redefinidos!');
     }
     
     function saveAndApplyUser() {
-    let v = document.getElementById('globalPacient').value;
-    if(v) {
-        v = capitalize(v);
-        const existing = db.savedUsers.find(u => u.fullName === v);
-        if(existing) {
-            applyToAllCards('pacient', v);
-            document.getElementById('globalPacient').value = '';
-            showMessage(`✅ Paciente aplicado!`);
-            document.getElementById('globalHospital').focus();
-        } else {
-            document.getElementById('saveItemAlias').value = '';
-            document.getElementById('saveItemValue').value = v;
-            document.getElementById('saveItemModal').style.display = 'flex';
-            pendingSaveType = 'user';
-            // Fix: Use setTimeout to ensure focus works after modal is rendered
-            setTimeout(() => {
-                const aliasInput = document.getElementById('saveItemAlias');
-                if(aliasInput) {
-                    aliasInput.focus();
-                }
-            }, 100);
+        let v = document.getElementById('globalPacient').value;
+        if(v) {
+            v = capitalize(v);
+            const existing = db.savedUsers.find(u => u.fullName === v);
+            if(existing) {
+                applyToAllCards('pacient', v);
+                document.getElementById('globalPacient').value = '';
+                showMessage(`✅ Paciente aplicado!`);
+                document.getElementById('globalHospital').focus();
+            } else {
+                document.getElementById('saveItemAlias').value = '';
+                document.getElementById('saveItemValue').value = v;
+                document.getElementById('saveItemModal').style.display = 'flex';
+                pendingSaveType = 'user';
+                // Fix: Use setTimeout to ensure focus works after modal is rendered
+                setTimeout(() => {
+                    const aliasInput = document.getElementById('saveItemAlias');
+                    if(aliasInput) {
+                        aliasInput.focus();
+                    }
+                }, 100);
+            }
         }
     }
-}
     
     function saveAndApplyHospital() {
-    let v = document.getElementById('globalHospital').value;
-    if(v) {
-        const existing = db.savedHospitals.find(h => h.hospitalName === v);
-        if(existing) {
-            applyToAllCards('hospital', existing.alias);
-            applyToAllCards('hospitalFullValue', v);
-            document.getElementById('globalHospital').value = '';
-            showMessage(`✅ Hospital aplicado!`);
-            document.getElementById('globalPacient').focus();
-        } else {
-            document.getElementById('saveItemAlias').value = '';
-            document.getElementById('saveItemValue').value = v;
-            document.getElementById('saveItemModal').style.display = 'flex';
-            pendingSaveType = 'hospital';
-            // Fix: Use setTimeout to ensure focus works after modal is rendered
-            setTimeout(() => {
-                const aliasInput = document.getElementById('saveItemAlias');
-                if(aliasInput) {
-                    aliasInput.focus();
-                }
-            }, 100);
+        let v = document.getElementById('globalHospital').value;
+        if(v) {
+            const existing = db.savedHospitals.find(h => h.hospitalName === v);
+            if(existing) {
+                applyToAllCards('hospital', existing.alias);
+                applyToAllCards('hospitalFullValue', v);
+                document.getElementById('globalHospital').value = '';
+                showMessage(`✅ Hospital aplicado!`);
+                document.getElementById('globalPacient').focus();
+            } else {
+                document.getElementById('saveItemAlias').value = '';
+                document.getElementById('saveItemValue').value = v;
+                document.getElementById('saveItemModal').style.display = 'flex';
+                pendingSaveType = 'hospital';
+                // Fix: Use setTimeout to ensure focus works after modal is rendered
+                setTimeout(() => {
+                    const aliasInput = document.getElementById('saveItemAlias');
+                    if(aliasInput) {
+                        aliasInput.focus();
+                    }
+                }, 100);
+            }
         }
     }
-}
     
     async function confirmSaveItem() {
         const alias = document.getElementById('saveItemAlias').value.trim();
@@ -1244,7 +1139,11 @@
         const container = document.getElementById('savedCardsList');
         if(!db.savedCards.length) { container.innerHTML = '<div style="text-align:center;padding:40px;">Nenhum conjunto salvo</div>'; return; }
         container.innerHTML = db.savedCards.map(c => `<div class="saved-card-item" data-id="${c.id}" style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:16px;cursor:pointer;"><div style="font-weight:700;">${c.name}</div><div style="font-size:0.7rem;">${new Date(c.timestamp).toLocaleString()}</div><div>📋 ${c.layout} cartões</div><button class="delete-card-btn" data-id="${c.id}" style="margin-top:8px;background:#fee2e2;border:none;padding:4px 12px;border-radius:20px;cursor:pointer;">✖ Remover</button></div>`).join('');
-        document.querySelectorAll('.saved-card-item').forEach(item => { item.onclick = async (e) => { if(e.target.classList.contains('delete-card-btn')) return; const set = db.savedCards.find(c => c.id == item.dataset.id); if(set) { currentLayout = set.layout; document.querySelectorAll('.layout-option').forEach(o => o.classList.remove('selected')); document.querySelector(`.layout-option[data-layout="${currentLayout}"]`).classList.add('selected'); globalLogo = set.globalLogo; if(globalLogo) { document.getElementById('logoPreview').src = globalLogo; document.getElementById('logoPreview').style.display = 'block'; document.getElementById('logoPlaceholder').style.display = 'none'; document.getElementById('removeLogoBtn').style.display = 'inline-block'; } individualLogos = [...set.individualLogos]; for(let i=0; i<set.cards.length; i++) cardData[i] = {...set.cards[i]}; renderCards(); showMessage(`"${set.name}" carregado!`); } }; });
+        document.querySelectorAll('.saved-card-item').forEach(item => { item.onclick = async (e) => { if(e.target.classList.contains('delete-card-btn')) return; const set = db.savedCards.find(c => c.id == item.dataset.id); if(set) { currentLayout = set.layout; document.querySelectorAll('.layout-option').forEach(o => o.classList.remove('selected')); document.querySelector(`.layout-option[data-layout="${currentLayout}"]`).classList.add('selected'); globalLogo = set.globalLogo; if(globalLogo) { document.getElementById('logoPreview').src = globalLogo; document.getElementById('logoPreview').style.display = 'block'; document.getElementById('logoPlaceholder').style.display = 'none'; document.getElementById('removeLogoBtn').style.display = 'inline-block'; } individualLogos = [...set.individualLogos]; for(let i=0; i<set.cards.length; i++) cardData[i] = {...set.cards[i]}; // Save as new defaults
+            db.defaultCards = cardData.slice(0, 2).map(c => c ? { ...c } : {});
+            await saveDb();
+            renderCards(); 
+            showMessage(`"${set.name}" carregado!`); } }; });
         document.querySelectorAll('.delete-card-btn').forEach(btn => { btn.onclick = async (e) => { e.stopPropagation(); db.savedCards = db.savedCards.filter(c => c.id != btn.dataset.id); await saveDb(); renderSavedCardsList(); document.getElementById('savedCount').innerText = `(${db.savedCards.length})`; showMessage('Removido!'); }; });
     }
     
@@ -1252,83 +1151,128 @@
     async function cleanSystem() { if(confirm('Limpar TODO o sistema? Esta ação é irreversível!')) { localStorage.clear(); location.reload(); } }
     
     function exportToExcel() { const rows = [['Paciente','Hospital','Endereço','Especialidade','Data','Horário']]; for(let i=0;i<currentLayout;i++){const d=cardData[i]||{}; rows.push([capitalize(d.pacient)||'',capitalize(getHospitalDisplayName(d.hospitalFullValue||''))||'',getHospitalFullAddress(d.hospitalFullValue||'')||'',d.speciality||'',d.date||'',d.hour||'']);} const blob=new Blob([rows.map(r=>r.join('\t')).join('\n')],{type:'application/vnd.ms-excel'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='agendamentos.xls'; a.click(); showMessage('Excel exportado!'); }
-    async function generatePDF() { 
-    const sheet = document.querySelector('.paper-sheet');
-    const badges = document.querySelectorAll('.copy-badge');
-    const originalGridClass = document.getElementById('cardsGrid').className;
     
-    badges.forEach(b => b.style.display = 'none');
-    
-    // Force proper dimensions before capture
-    sheet.style.width = '21cm';
-    sheet.style.minHeight = '29.7cm';
-    sheet.style.backgroundColor = 'white';
-    
-    // Wait for layout to stabilize
-    await new Promise(r => setTimeout(r, 200));
-    
-    try {
-        const canvas = await html2canvas(sheet, {
-            scale: 3,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false,
-            windowWidth: sheet.scrollWidth,
-            windowHeight: sheet.scrollHeight,
-            onclone: (clonedDoc, element) => {
-                const clonedSheet = clonedDoc.querySelector('.paper-sheet');
-                if (clonedSheet) {
-                    clonedSheet.style.width = '21cm';
-                    clonedSheet.style.minHeight = '29.7cm';
-                }
-            }
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
+    // ==================== FIXED PDF GENERATION ====================
+    async function generatePDF() {
         const { jsPDF } = window.jspdf;
-        
-        // A4 dimensions in mm
-        const pdfWidth = 210;
-        const pdfHeight = 297;
-        
-        // Calculate image dimensions to fit exactly on A4
-        const imgAspectRatio = canvas.width / canvas.height;
-        const pdfAspectRatio = pdfWidth / pdfHeight;
-        
-        let finalWidth, finalHeight, xOffset = 0, yOffset = 0;
-        
-        if (imgAspectRatio > pdfAspectRatio) {
-            // Image is wider - fit to width
-            finalWidth = pdfWidth;
-            finalHeight = pdfWidth / imgAspectRatio;
-            yOffset = (pdfHeight - finalHeight) / 2;
-        } else {
-            // Image is taller - fit to height
-            finalHeight = pdfHeight;
-            finalWidth = pdfHeight * imgAspectRatio;
-            xOffset = (pdfWidth - finalWidth) / 2;
-        }
-        
         const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
             format: 'a4'
         });
         
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
-        pdf.save('agendamentos.pdf');
+        const a4Width = 210; // mm
+        const a4Height = 297; // mm
+        const margin = 5; // mm
         
-        showMessage(`PDF gerado! Layout: ${currentLayout} cartões`);
+        let rows, cols;
+        switch (currentLayout) {
+            case 2: rows = 2; cols = 1; break;
+            case 4: rows = 2; cols = 2; break;
+            case 6: rows = 3; cols = 2; break;
+            case 8: rows = 4; cols = 2; break;
+            default: rows = 2; cols = 1;
+        }
         
-    } catch (error) {
-        console.error('PDF Error:', error);
-        showMessage('Erro ao gerar PDF. Use Imprimir (Ctrl+P) como alternativa.', 'error');
-    } finally {
-        sheet.style.width = '';
-        sheet.style.minHeight = '';
+        const cardWidth = (a4Width - (margin * 2)) / cols;
+        const cardHeight = (a4Height - (margin * 2)) / rows;
+        
+        // Hide copy badges temporarily
+        const badges = document.querySelectorAll('.copy-badge');
+        badges.forEach(b => b.style.display = 'none');
+        
+        // Process cards in groups per page
+        const cardsPerPage = rows * cols;
+        const totalPages = Math.ceil(currentLayout / cardsPerPage);
+        
+        for (let page = 0; page < totalPages; page++) {
+            if (page > 0) {
+                pdf.addPage();
+            }
+            
+            const startIdx = page * cardsPerPage;
+            const endIdx = Math.min(startIdx + cardsPerPage, currentLayout);
+            
+            // Get all appointment cards elements
+            const cardElements = document.querySelectorAll('.appointment-card');
+            
+            for (let i = startIdx; i < endIdx; i++) {
+                const cardIndex = i;
+                const row = Math.floor((i - startIdx) / cols);
+                const col = (i - startIdx) % cols;
+                
+                const x = margin + (col * cardWidth);
+                const y = margin + (row * cardHeight);
+                
+                // Clone the card for rendering
+                const originalCard = cardElements[cardIndex];
+                if (!originalCard) continue;
+                
+                const cloneCard = originalCard.cloneNode(true);
+                cloneCard.style.position = 'absolute';
+                cloneCard.style.left = '-9999px';
+                cloneCard.style.top = '-9999px';
+                cloneCard.style.width = cardWidth + 'mm';
+                cloneCard.style.minHeight = cardHeight + 'mm';
+                cloneCard.style.margin = '0';
+                cloneCard.style.padding = '8px';
+                cloneCard.style.border = '1px solid #ddd';
+                cloneCard.style.borderRadius = '8px';
+                cloneCard.style.backgroundColor = 'white';
+                cloneCard.style.boxSizing = 'border-box';
+                
+                // Adjust font sizes for better fit
+                cloneCard.querySelectorAll('.detail-label').forEach(el => {
+                    el.style.fontSize = '9px';
+                    el.style.minWidth = '70px';
+                });
+                cloneCard.querySelectorAll('.detail-value').forEach(el => {
+                    el.style.fontSize = '9px';
+                });
+                cloneCard.querySelectorAll('.card-title').forEach(el => {
+                    el.style.fontSize = '8px';
+                    el.style.padding = '3px 8px';
+                });
+                cloneCard.querySelectorAll('.card-footer span').forEach(el => {
+                    el.style.fontSize = '7px';
+                });
+                cloneCard.querySelectorAll('.hospital-name').forEach(el => {
+                    el.style.fontSize = '11px';
+                });
+                cloneCard.querySelectorAll('.copy-badge').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                document.body.appendChild(cloneCard);
+                
+                try {
+                    const canvas = await html2canvas(cloneCard, {
+                        scale: 2,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        useCORS: true
+                    });
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = cardWidth - 2;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'PNG', x + 1, y + 1, imgWidth, imgHeight);
+                } catch (err) {
+                    console.error('Error rendering card:', err);
+                }
+                
+                document.body.removeChild(cloneCard);
+            }
+        }
+        
+        // Restore badges
         badges.forEach(b => b.style.display = 'flex');
+        
+        pdf.save('agendamentos.pdf');
+        showMessage(`PDF gerado com ${totalPages} página(s)!`);
     }
-}
+    
     function printPreview() { window.print(); }
     async function downloadImage() { const sheet=document.querySelector('.paper-sheet'); const badges=document.querySelectorAll('.copy-badge'); badges.forEach(b=>b.style.display='none'); const canvas=await html2canvas(sheet,{scale:2}); badges.forEach(b=>b.style.display='flex'); const a=document.createElement('a'); a.download='cartoes.png'; a.href=canvas.toDataURL(); a.click(); showMessage('Imagem salva!'); }
     
@@ -1381,7 +1325,15 @@
         currentLayout = db.settings.lastLayout || 2;
         document.querySelectorAll('.layout-option').forEach(opt => { if(parseInt(opt.dataset.layout)===currentLayout) opt.classList.add('selected'); opt.onclick = () => { document.querySelectorAll('.layout-option').forEach(o=>o.classList.remove('selected')); opt.classList.add('selected'); currentLayout = parseInt(opt.dataset.layout); db.settings.lastLayout = currentLayout; saveDb(); renderCards(); }; });
         
-        for(let i=0;i<8;i++) cardData[i] = {};
+        // Initialize cardData with default cards (2 cards pre-configured)
+        for(let i = 0; i < 8; i++) {
+            // Use default cards if available, otherwise empty
+            if (db.defaultCards && i < db.defaultCards.length) {
+                cardData[i] = { ...db.defaultCards[i] };
+            } else {
+                cardData[i] = {};
+            }
+        }
         renderCards();
         renderSavedCardsList();
         renderGlobalSavedItems();
@@ -1457,57 +1409,34 @@
         });
     }
     
-function showPasswordPrompt() {
-    const overlay = document.createElement('div');
-    overlay.className = 'password-prompt';
-    overlay.innerHTML = `
-        <div class="password-box">
-            <h2 style="color:var(--primary);">🔐 MedCard Pro v24</h2>
-            <p style="margin:16px 0;">Segurança máxima: WebCrypto AES-GCM + PBKDF2 (100k iterações)</p>
-            <p style="margin:8px 0; font-size:0.8rem; color:var(--gray-600);">Nenhuma senha é armazenada. Apenas você sabe sua senha!</p>
-            <input type="password" id="pwdInput" placeholder="Digite sua senha" style="width:100%;margin-bottom:16px;padding:12px;border-radius:10px;border:1px solid #ccc;">
-            <button id="unlockBtn" class="button secondary" style="width:100%;">🔓 Desbloquear</button>
-            <button id="newDbBtn" class="button" style="width:100%;margin-top:12px;">🆕 Criar Novo Banco de Dados</button>
-            <div class="security-badge">
-                🔒 AES-256-GCM | PBKDF2-SHA256 | 100,000 iterações | Salt aleatório
+    function showPasswordPrompt() {
+        const overlay = document.createElement('div');
+        overlay.className = 'password-prompt';
+        overlay.innerHTML = `
+            <div class="password-box">
+                <h2 style="color:var(--primary);">🔐 MedCard Pro v24</h2>
+                <p style="margin:16px 0;">Segurança máxima: WebCrypto AES-GCM + PBKDF2 (100k iterações)</p>
+                <p style="margin:8px 0; font-size:0.8rem; color:var(--gray-600);">Nenhuma senha é armazenada. Apenas você sabe sua senha!</p>
+                <input type="password" id="pwdInput" placeholder="Digite sua senha" style="width:100%;margin-bottom:16px;padding:12px;border-radius:10px;border:1px solid #ccc;">
+                <button id="unlockBtn" class="button secondary" style="width:100%;">🔓 Desbloquear</button>
+                <button id="newDbBtn" class="button" style="width:100%;margin-top:12px;">🆕 Criar Novo Banco de Dados</button>
+                <div class="security-badge">
+                    🔒 AES-256-GCM | PBKDF2-SHA256 | 100,000 iterações | Salt aleatório
+                </div>
             </div>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-    
-    // Fix: Use setTimeout to ensure focus works after DOM is ready
-    setTimeout(() => {
-        const pwdInput = document.getElementById('pwdInput');
-        if(pwdInput) {
-            pwdInput.focus();
-        }
-    }, 100);
-    
-    document.getElementById('unlockBtn').onclick = async () => {
-        const password = document.getElementById('pwdInput').value;
-        if (!password) { alert('Digite uma senha'); return; }
-        try {
-            const salt = getStoredSalt();
-            if (!salt) throw new Error('Database corrompido');
-            await loadDb(password, salt);
-            overlay.remove();
-            initApp();
-            showMessage('✅ Banco desbloqueado com sucesso!');
-        } catch(e) {
-            alert('❌ Senha incorreta!');
+        `;
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => {
             const pwdInput = document.getElementById('pwdInput');
-            pwdInput.value = '';
-            setTimeout(() => {
+            if(pwdInput) {
                 pwdInput.focus();
-            }, 50);
-        }
-    };
-    
-    document.getElementById('pwdInput').addEventListener('keydown', async function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
+            }
+        }, 100);
+        
+        document.getElementById('unlockBtn').onclick = async () => {
             const password = document.getElementById('pwdInput').value;
-            if (!password) return;
+            if (!password) { alert('Digite uma senha'); return; }
             try {
                 const salt = getStoredSalt();
                 if (!salt) throw new Error('Database corrompido');
@@ -1523,57 +1452,69 @@ function showPasswordPrompt() {
                     pwdInput.focus();
                 }, 50);
             }
+        };
+        
+        document.getElementById('pwdInput').addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const password = document.getElementById('pwdInput').value;
+                if (!password) return;
+                try {
+                    const salt = getStoredSalt();
+                    if (!salt) throw new Error('Database corrompido');
+                    await loadDb(password, salt);
+                    overlay.remove();
+                    initApp();
+                    showMessage('✅ Banco desbloqueado com sucesso!');
+                } catch(e) {
+                    alert('❌ Senha incorreta!');
+                    const pwdInput = document.getElementById('pwdInput');
+                    pwdInput.value = '';
+                    setTimeout(() => {
+                        pwdInput.focus();
+                    }, 50);
+                }
+            }
+        });
+        
+        document.getElementById('newDbBtn').onclick = async () => {
+            const password = prompt('🔐 CRIAR NOVO BANCO\n\nDigite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA! Sem ela você NUNCA mais terá acesso aos seus dados!');
+            if (password && password.length >= 4) {
+                const confirmPwd = prompt('Confirme a senha:');
+                if (password === confirmPwd) {
+                    await createNewDb(password);
+                    overlay.remove();
+                    initApp();
+                    showMessage('✅ Novo banco de dados criado com segurança máxima!');
+                } else { alert('Senhas não coincidem!'); }
+            } else { alert('Senha deve ter no mínimo 4 caracteres!'); }
+        };
+    }
+    
+    if (databaseExists()) {
+        showPasswordPrompt();
+    } else {
+        showPasswordPrompt();
+    }
+    
+    const byIds = {
+        globalHospital: 'saveItemAlias',
+        globalPacient: 'saveItemAlias',
+    };
+    
+    const trigger = document.getElementById('saveItemAlias');
+    
+    trigger.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            confirmSaveItem();
+            
+            Object.keys(byIds).forEach(targetId => {
+                const target = document.getElementById(targetId);
+                if (target) target.value = "";
+            });
         }
     });
-    
-    document.getElementById('newDbBtn').onclick = async () => {
-        const password = prompt('🔐 CRIAR NOVO BANCO\n\nDigite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA! Sem ela você NUNCA mais terá acesso aos seus dados!');
-        if (password && password.length >= 4) {
-            const confirmPwd = prompt('Confirme a senha:');
-            if (password === confirmPwd) {
-                await createNewDb(password);
-                overlay.remove();
-                initApp();
-                showMessage('✅ Novo banco de dados criado com segurança máxima!');
-            } else { alert('Senhas não coincidem!'); }
-        } else { alert('Senha deve ter no mínimo 4 caracteres!'); }
-    };
-}
-
-if (databaseExists()) {
-    showPasswordPrompt();
-} else {
-    showPasswordPrompt();
-}
-
-
-    /**/
-
-
-const byIds = {
-    globalHospital: 'saveItemAlias',
-    globalPacient: 'saveItemAlias',
-};
-
-const trigger = document.getElementById('saveItemAlias');
-
-trigger.addEventListener('keydown', function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        confirmSaveItem();
-
-        // clear all targets
-        Object.keys(byIds).forEach(targetId => {
-            const target = document.getElementById(targetId);
-            if (target) target.value = "";
-        });
-    }
-});
-
-
-
-
-
 </script>
 </body>
 </html>
