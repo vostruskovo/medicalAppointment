@@ -270,36 +270,43 @@
             font-size: 1rem;
             padding: 8px 0;
         }
+
+        :root{
+            --oneLayoutHospital:2.0rem;
+            --oneLayoutTitle:2.0rem;
+            --oneLayoutValue:2.0rem;
+            --oneLayoutLogo:500px;
+            --oneLayoutFooter:30rem;
+        }
+        /* LAYOUT 1 - Single Card */
+.layout-1-cards .appointment-card .card-footer {
+    font-size: var(--oneLayoutFooter) !important;
+    padding: 12px 16px !important;
+    gap: 25px !important;
+    flex-direction: row !important;
+}
+        .layout-1-cards .appointment-card .hospital-name { 
+    font-size: var(--oneLayoutHospital) !important; 
+    margin-left: 60px !important;
+}
+.layout-1-cards .appointment-card .card-title { 
+    font-size: var(--oneLayoutTitle) !important; 
+    padding: 0px 0px !important;
+}
         .layout-1-cards .appointment-card .detail-label {
             min-width: 110px;
-            font-size: 0.95rem;
+            font-size: var(--oneLayoutValue);
         }
         .layout-1-cards .appointment-card .detail-value {
-            font-size: 0.95rem;
+            font-size: var(--oneLayoutValue);
         }
         .layout-1-cards .appointment-card .card-logo-container {
-            width: 280px;
+            width: var(--oneLayoutLogo);
             height: 130px;
-        }
-        .layout-1-cards .appointment-card .hospital-name {
-            font-size: 1.2rem;
-            margin-left: 90px;
-        }
-        .layout-1-cards .appointment-card .card-title {
-            font-size: 0.8rem;
-            margin-left: 90px;
-            margin-bottom: 20px;
-            padding: 6px 16px;
         }
         .layout-1-cards .appointment-details {
             gap: 12px;
             margin-bottom: 20px;
-        }
-        .layout-1-cards .appointment-card .card-footer {
-            font-size: 0.8rem;
-            padding-top: 14px;
-            margin-top: 10px;
-            gap: 25px;
         }
         
         /* ==================== LAYOUT 2 CARDS - Medium-Large ==================== */
@@ -314,36 +321,44 @@
             font-size: 0.85rem;
             padding: 6px 0;
         }
+ :root{
+            --twoLayoutHospital:1.5rem;
+            --twoLayoutTitle:1.0rem;
+            --twoLayoutValue:1.0rem;
+            --twoLayoutLogo:250px;
+            --twoLayoutFooter:30rem;
+        }
+         /* LAYOUT 2 - Two Cards */
+.layout-2-cards .appointment-card .card-footer {
+    font-size: var(--twoLayoutFooter) !important;
+    gap: 6px !important;
+    padding: 3px 6px !important;
+    margin-top: 3px !important;
+    line-height: 1 !important;
+}
+         .layout-2-cards .appointment-card .hospital-name { 
+    font-size: var(--twoLayoutHospital) !important; 
+    margin-left: 45px !important;
+}
+.layout-2-cards .appointment-card .card-title { 
+    font-size: var(--twoLayoutTitle) !important; 
+    padding: 2px 10px !important;
+}
         .layout-2-cards .appointment-card .detail-label {
             min-width: 95px;
-            font-size: 0.8rem;
+            font-size: var(--twoLayoutValue);
         }
         .layout-2-cards .appointment-card .detail-value {
-            font-size: 0.8rem;
+            font-size: var(--twoLayoutValue);
         }
         .layout-2-cards .appointment-card .card-logo-container {
-            width: 220px;
+            width: var(--twoLayoutLogo);
             height: 100px;
         }
-        .layout-2-cards .appointment-card .hospital-name {
-            font-size: 1rem;
-            margin-left: 70px;
-        }
-        .layout-2-cards .appointment-card .card-title {
-            font-size: 0.7rem;
-            margin-left: 70px;
-            margin-bottom: 16px;
-            padding: 5px 14px;
-        }
+
         .layout-2-cards .appointment-details {
             gap: 10px;
             margin-bottom: 16px;
-        }
-        .layout-2-cards .appointment-card .card-footer {
-            font-size: 0.7rem;
-            padding-top: 12px;
-            margin-top: 8px;
-            gap: 20px;
         }
         
         /* ==================== LAYOUT 4 CARDS - Medium ==================== */
@@ -358,36 +373,46 @@
             font-size: 0.7rem;
             padding: 4px 0;
         }
+ :root{
+            --fourLayoutHospital:1.5rem;
+            --fourLayoutTitle:1.1rem;
+            --fourLayoutValue:1.1rem;
+            --fourLayoutLogo:125px;
+            --fourLayoutFooter:30rem;
+        }
+/* For Layout 4 - make footer smaller */
+.layout-4-cards .appointment-card .card-footer {
+    font-size: var(--fourLayoutFooter) !important;
+    gap: 4px !important;
+    padding: 4px 8px !important;
+    margin-top: 4px !important;
+    line-height: 1.2 !important;
+    flex-direction: column !important;
+}
+.layout-4-cards .appointment-card .card-title { 
+    font-size: var(--fourLayoutTitle) !important; 
+    padding: 2px 8px !important;
+}
+.layout-4-cards .appointment-card .hospital-name { 
+    font-size: var(--fourLayoutHospital) !important; 
+    margin-left: 35px !important;
+}
+
         .layout-4-cards .appointment-card .detail-label {
             min-width: 80px;
-            font-size: 0.68rem;
+            font-size: var(--fourLayoutValue);
         }
         .layout-4-cards .appointment-card .detail-value {
-            font-size: 0.68rem;
+            font-size: var(--fourLayoutValue);
         }
         .layout-4-cards .appointment-card .card-logo-container {
-            width: 160px;
+            width: var(--fourLayoutLogo);
             height: 75px;
         }
-        .layout-4-cards .appointment-card .hospital-name {
-            font-size: 0.85rem;
-            margin-left: 50px;
-        }
-        .layout-4-cards .appointment-card .card-title {
-            font-size: 0.6rem;
-            margin-left: 50px;
-            margin-bottom: 12px;
-            padding: 4px 10px;
-        }
+
         .layout-4-cards .appointment-details {
             gap: 6px;
             margin-bottom: 12px;
-        }
-        .layout-4-cards .appointment-card .card-footer {
-            font-size: 0.6rem;
-            padding-top: 8px;
-            margin-top: 6px;
-            gap: 12px;
         }
         
         /* ==================== LAYOUT 6 CARDS - Small ==================== */
@@ -402,36 +427,47 @@
             font-size: 0.62rem;
             padding: 3px 0;
         }
+ :root{
+            --sixLayoutHospital:1.0rem;
+            --sixLayoutTitle:1.0rem;
+            --sixLayoutValue:1.0rem;
+            --sixLayoutLogo:125px;
+             --sixLayoutFooter:30rem;
+        }
+        /* For Layout 6 - even smaller */
+.layout-6-cards .appointment-card .card-footer {
+    font-size: var(--sixLayoutFooter) !important;
+    gap: 2px !important;
+    padding: 3px 6px !important;
+    margin-top: 3px !important;
+    line-height: 1.1 !important;
+    flex-direction: column !important;
+}
+
+.layout-6-cards .appointment-card .card-title { 
+    font-size: var(--sixLayoutTitle) !important; 
+    padding: 1px 6px !important;
+}
+.layout-6-cards .appointment-card .hospital-name { 
+    font-size: var(--sixLayoutHospital) !important; 
+    margin-left: 25px !important;
+}
+
         .layout-6-cards .appointment-card .detail-label {
             min-width: 68px;
-            font-size: 0.6rem;
+            font-size: var(--sixLayoutValue);
         }
         .layout-6-cards .appointment-card .detail-value {
-            font-size: 0.6rem;
+            font-size: var(--sixLayoutValue);
         }
         .layout-6-cards .appointment-card .card-logo-container {
-            width: 120px;
+            width: var(--sixLayoutLogo);
             height: 55px;
         }
-        .layout-6-cards .appointment-card .hospital-name {
-            font-size: 0.7rem;
-            margin-left: 35px;
-        }
-        .layout-6-cards .appointment-card .card-title {
-            font-size: 0.55rem;
-            margin-left: 35px;
-            margin-bottom: 8px;
-            padding: 3px 8px;
-        }
+
         .layout-6-cards .appointment-details {
             gap: 4px;
             margin-bottom: 8px;
-        }
-        .layout-6-cards .appointment-card .card-footer {
-            font-size: 0.5rem;
-            padding-top: 6px;
-            margin-top: 4px;
-            gap: 8px;
         }
         
         /* ==================== LAYOUT 8 CARDS - Extra Small ==================== */
@@ -446,37 +482,46 @@
             font-size: 0.55rem;
             padding: 2px 0;
         }
+ :root{
+            --eightLayoutHospital:1.0rem;
+            --eightLayoutTitle:.8rem;
+            --eightLayoutValue:1.0rem;
+            --eightLayoutLogo:125px;
+            --eightLayoutFooter:30rem;
+        }
+       /* LAYOUT 8 - Eight Cards (YOUR VERSION - even smaller) */
+.layout-8-cards .appointment-card .card-footer {
+    font-size: var(--eightLayoutFooter) !important;
+    gap: 1px !important;
+    padding: 1px 2px !important;
+    margin-top: 1px !important;
+    line-height: 0.90 !important;
+}
+.layout-8-cards .appointment-card .card-title { 
+    font-size: var(--eightLayoutTitle) !important; 
+    padding: 1px 5px !important;
+}
+.layout-8-cards .appointment-card .hospital-name { 
+    font-size: var(--eightLayoutHospital) !important; 
+    margin-left: 20px !important;
+}
         .layout-8-cards .appointment-card .detail-label {
             min-width: 60px;
-            font-size: 0.53rem;
+            font-size: var(--eightLayoutValue);
         }
         .layout-8-cards .appointment-card .detail-value {
-            font-size: 0.53rem;
+            font-size: var(--eightLayoutValue);
         }
         .layout-8-cards .appointment-card .card-logo-container {
-            width: 100px;
+            width: var(--eightLayoutLogo);
             height: 45px;
         }
-        .layout-8-cards .appointment-card .hospital-name {
-            font-size: 0.6rem;
-            margin-left: 25px;
-        }
-        .layout-8-cards .appointment-card .card-title {
-            font-size: 0.5rem;
-            margin-left: 25px;
-            margin-bottom: 6px;
-            padding: 2px 6px;
-        }
+
         .layout-8-cards .appointment-details {
             gap: 3px;
             margin-bottom: 6px;
         }
-        .layout-8-cards .appointment-card .card-footer {
-            font-size: 0.45rem;
-            padding-top: 4px;
-            margin-top: 3px;
-            gap: 6px;
-        }
+
         
         /* ==================== FIXED PRINT STYLES ==================== */
         @media print {
