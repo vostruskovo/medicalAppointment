@@ -723,7 +723,60 @@
     async function generatePDF() { const sheet=document.querySelector('.paper-sheet'); const badges=document.querySelectorAll('.copy-badge'); const clearBtns=document.querySelectorAll('.clear-card-btn'); badges.forEach(b=>b.style.display='none'); clearBtns.forEach(b=>b.style.display='none'); sheet.style.width='210mm'; sheet.style.minHeight='297mm'; await new Promise(r=>setTimeout(r,300)); try { const canvas=await html2canvas(sheet,{scale:3,backgroundColor:'#ffffff'}); const imgData=canvas.toDataURL('image/png'); const {jsPDF}=window.jspdf; const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'}); pdf.addImage(imgData,'PNG',0,0,210,297); pdf.save(`agendamentos.pdf`); showMessage(`PDF gerado!`); } catch(e){ showMessage('Erro ao gerar PDF','error'); } finally { sheet.style.width=''; sheet.style.minHeight=''; badges.forEach(b=>b.style.display='flex'); clearBtns.forEach(b=>b.style.display='flex'); } }
     function printPreview() { const badges=document.querySelectorAll('.copy-badge'); const clearBtns=document.querySelectorAll('.clear-card-btn'); badges.forEach(b=>b.style.display='none'); clearBtns.forEach(b=>b.style.display='none'); setTimeout(()=>{ window.print(); setTimeout(()=>{ badges.forEach(b=>b.style.display='flex'); clearBtns.forEach(b=>b.style.display='flex'); },500); },100); }
     async function downloadImage() { const sheet=document.querySelector('.paper-sheet'); const badges=document.querySelectorAll('.copy-badge'); const clearBtns=document.querySelectorAll('.clear-card-btn'); badges.forEach(b=>b.style.display='none'); clearBtns.forEach(b=>b.style.display='none'); const canvas=await html2canvas(sheet,{scale:2}); badges.forEach(b=>b.style.display='flex'); clearBtns.forEach(b=>b.style.display='flex'); const a=document.createElement('a'); a.download='cartoes.png'; a.href=canvas.toDataURL(); a.click(); showMessage('Imagem salva!'); }
-    function populateSpecialties() { const specialties=['Cardiologista','Dermatologista','Oftalmologista','Ortopedista','Pediatra','Ginecologista','Clínico Geral','Otorrinolaringologista','Neurologista','Urologista','Endocrinologista']; const sel=document.getElementById('global-speciality'); const modalSel=document.getElementById('modalSpeciality'); sel.innerHTML=''; modalSel.innerHTML=''; specialties.forEach(s=>{ sel.appendChild(new Option(s,s)); modalSel.appendChild(new Option(s,s)); }); }
+    function populateSpecialties() {
+  const specialties = [
+    'Alergologista',
+    'Anestesiologista',
+    'Angiologista',
+    'Cardiologista',
+    'Cirurgião Cardiovascular',
+    'Cirurgião Geral',
+    'Cirurgião Plástico',
+    'Cirurgião Torácico',
+    'Cirurgião Vascular',
+    'Clínico Geral',
+    'Dermatologista',
+    'Endocrinologista',
+    'Gastroenterologista',
+    'Geriatra',
+    'Ginecologista',
+    'Hematologista',
+    'Infectologista',
+    'Mastologista',
+    'Nefrologista',
+    'Neurocirurgião',
+    'Neurologista',
+    'Nutrólogo',
+    'Obstetra',
+    'Oftalmologista',
+    'Oncologista',
+    'Ortopedista',
+    'Otorrinolaringologista',
+    'Pediatra',
+    'Pneumologista',
+    'Psiquiatra',
+    'Radiologista',
+    'Reumatologista',
+    'Urologista',
+    'Medicina do Trabalho',
+    'Medicina Esportiva',
+    'Medicina Intensiva',
+    'Medicina Nuclear',
+    'Medicina Preventiva',
+    'Patologista',
+    'Proctologista'
+  ];
+
+  const sel = document.getElementById('global-speciality');
+  const modalSel = document.getElementById('modalSpeciality');
+  sel.innerHTML = '';
+  modalSel.innerHTML = '';
+  specialties.forEach(s => {
+    sel.appendChild(new Option(s, s));
+    modalSel.appendChild(new Option(s, s));
+  });
+}
+
     
     function setupAllDropdowns() { setupSmartDropdown('globalPacient','globalPacientContainer',db.savedUsers,i=>i.fullName,'user',false,null); setupSmartDropdown('globalHospital','globalHospitalContainer',db.savedHospitals,i=>i.hospitalName,'hospital',false,null); }
     function setupModalDropdowns() { setupSmartDropdown('modalPacient','modalPacientContainer',db.savedUsers,i=>i.fullName,'user',true,saveModalEdit); setupSmartDropdown('modalHospital','modalHospitalContainer',db.savedHospitals,i=>i.hospitalName,'hospital',true,saveModalEdit); const modalSpec=document.getElementById('modalSpeciality'); const modalDate=document.getElementById('modalDate'); const modalHour=document.getElementById('modalHour'); if(modalSpec) modalSpec.onkeypress=(e)=>{if(e.key==='Enter'){e.preventDefault();saveModalEdit();}}; if(modalDate) modalDate.onkeypress=(e)=>{if(e.key==='Enter'){e.preventDefault();saveModalEdit();}}; if(modalHour) modalHour.onkeypress=(e)=>{if(e.key==='Enter'){e.preventDefault();saveModalEdit();}}; }
