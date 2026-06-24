@@ -470,7 +470,7 @@
             <h2 class="section-title" id="previewTitle">📄 Pré-visualização</h2>
             <div style="overflow-x: auto; text-align: center;">
                 <div class="paper-sheet">
-                    <div class="appointments-grid layout-2-cards" id="cardsGrid"></div>
+                    <div class="appointments-grid" id="cardsGrid"></div>
                 </div>
             </div>
             <div class="actions">
@@ -854,19 +854,17 @@
         
         // ============ LAYOUT SELECTOR - FIXED ============
         const layoutOptions = document.querySelectorAll('.layout-option');
-        // Remove all selected classes first
+        // Remove ALL selected classes first
         layoutOptions.forEach(o => o.classList.remove('selected'));
         
         // Set the correct layout from DEFAULT_LAYOUT
         currentLayout = DEFAULT_LAYOUT;
         
-        // Also save it to db if it's different
-        if (db.settings.lastLayout !== DEFAULT_LAYOUT) {
-            db.settings.lastLayout = DEFAULT_LAYOUT;
-            saveDb();
-        }
+        // Update db settings
+        db.settings.lastLayout = DEFAULT_LAYOUT;
+        await saveDb();
         
-        // Find and select the matching layout option
+        // Select ONLY the matching layout option
         layoutOptions.forEach(opt => {
             if (parseInt(opt.dataset.layout) === currentLayout) {
                 opt.classList.add('selected');
@@ -881,6 +879,7 @@
             };
         });
         
+        // Initialize card data
         for(let i = 0; i < 8; i++) cardData[i] = {};
         renderCards(); 
         renderSavedCardsList(); 
