@@ -762,16 +762,7 @@
             return; 
         }
         
-        const exists = db.savedCards.some(c => c.name.toLowerCase() === name.toLowerCase());
-        if (exists) {
-            if (!confirm(`Já existe um conjunto com o nome "${name}". Deseja sobrescrever?`)) {
-                nameInput.focus();
-                nameInput.select();
-                return;
-            }
-            db.savedCards = db.savedCards.filter(c => c.name.toLowerCase() !== name.toLowerCase());
-        }
-        
+            
         db.savedCards.unshift({
             id: Date.now(),
             name: name,
