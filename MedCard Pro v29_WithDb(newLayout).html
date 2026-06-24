@@ -360,14 +360,27 @@
         
         @keyframes slideRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .esc-hint { margin-top: 16px; text-align: center; font-size: 0.7rem; color: var(--gray-600); }
-        .password-prompt { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .password-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(50px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
         .password-box { background: white; border-radius: 32px; padding: 32px; width: 90%; max-width: 400px; text-align: center; border: 3px solid black; }
         .security-badge { background: #2a9d8f20; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; margin-top: 12px; }
         .database-status { background: var(--gray-100); padding: 8px 16px; border-radius: 40px; display: inline-flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
-<div class="container" id="mainApp" style="display:none;">
+<div class="container">
     <header>
         <div class="language-switcher">
             <button class="lang-btn" data-lang="pt">🇧🇷 PT</button>
@@ -398,7 +411,7 @@
                 <label id="layoutLabel">📐 Layout A4</label>
                 <div class="layout-options">
                     <div class="layout-option" data-layout="1">1</div>
-                    <div class="layout-option" data-layout="2">2</div>
+                    <div class="layout-option selected" data-layout="2">2</div>
                     <div class="layout-option" data-layout="4">4</div>
                     <div class="layout-option" data-layout="6">6</div>
                     <div class="layout-option" data-layout="8">8</div>
@@ -470,7 +483,7 @@
             <h2 class="section-title" id="previewTitle">📄 Pré-visualização</h2>
             <div style="overflow-x: auto; text-align: center;">
                 <div class="paper-sheet">
-                    <div class="appointments-grid" id="cardsGrid"></div>
+                    <div class="appointments-grid layout-2-cards" id="cardsGrid"></div>
                 </div>
             </div>
             <div class="actions">
@@ -553,9 +566,6 @@
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-    // ==================== DEFAULT LAYOUT ====================
-    const DEFAULT_LAYOUT = 2; // Change this to 1, 2, 4, 6, or 8
-
     // ==================== TRANSLATIONS ====================
     const translations = {
         pt: { appTitle: "🏥 MedCard Pro v28", appSubtitle: "❌ X limpa cartão individual", settingsTitle: "⚙️ Configurações", savedSetsText: "Conjuntos", layoutLabel: "📐 Layout A4", patientLabel: "👤 Paciente (só vazios)", hospitalLabel: "🏨 Hospital (só vazios)", specialityLabel: "🔬 Especialidade (só vazios)", dateLabel: "📅 Data (só vazios)", timeLabel: "⏰ Horário (só vazios)", logoLabel: "🖼️ Logo Padrão", previewTitle: "📄 Pré-visualização", editCardTitle: "✏️ Editar Cartão", modalPatientLabel: "👤 Paciente", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Especialidade", modalDateLabel: "📅 Data", modalTimeLabel: "⏰ Horário", modalHint: "💡 ENTER: dropdown aberto seleciona | fechado salva o cartão", saveSetModalTitle: "💾 Salvar Conjunto", setNameLabel: "Nome do Conjunto", saveItemModalTitle: "💾 Salvar Item", saveItemAliasLabel: "📝 Apelido (Alias)", saveItemValueLabel: "📋 Valor Completo", editSavedItemTitle: "✏️ Editar Item", editSavedItemAliasLabel: "📝 Apelido (Alias)", editSavedItemValueLabel: "📋 Valor Completo", dangerZoneTitle: "⚠️ Área de Perigo", savedSetsTitle: "📦 Conjuntos Salvos", cardHospital: "HOSPITAL", cardTitle: "AGENDAMENTO MÉDICO", cardPatient: "Paciente:", cardSpecialty: "Especialidade:", cardDate: "Data:", cardTime: "Horário:", cardLocation: "Local:", cardFooter1: "✓ Chegar 15 min antes", cardFooter2: "📞 Agendamento confirmado" },
@@ -564,13 +574,10 @@
     };
     
     let currentLang = 'pt';
-    let currentLayout = DEFAULT_LAYOUT;
-    let globalLogo = null;
-    let cardData = [];
-    let individualLogos = Array(8).fill(null);
+    let currentLayout = 2, globalLogo = null, cardData = [], individualLogos = Array(8).fill(null);
     let copiedCardBuffer = null, copiedFromIndex = null, pastedCards = new Set();
     let currentEditIndex = -1;
-    let db = { savedUsers: [], savedHospitals: [], savedCards: [], globalLogo: null, settings: { lastLayout: DEFAULT_LAYOUT } };
+    let db = { savedUsers: [], savedHospitals: [], savedCards: [], globalLogo: null, settings: { lastLayout: 2 } };
     let cryptoKey = null;
     
     function capitalize(s) { if(!s) return ''; return s.split(' ').map(w => w[0]?.toUpperCase() + w.slice(1).toLowerCase()).join(' '); }
@@ -768,15 +775,8 @@
             return; 
         }
         
-        const exists = db.savedCards.some(c => c.name.toLowerCase() === name.toLowerCase());
-        if (exists) {
-            if (!confirm(`Já existe um conjunto com o nome "${name}". Deseja sobrescrever?`)) {
-                nameInput.focus();
-                nameInput.select();
-                return;
-            }
-            db.savedCards = db.savedCards.filter(c => c.name.toLowerCase() !== name.toLowerCase());
-        }
+        db.savedCards = db.savedCards.filter(c => c.name.toLowerCase() !== name.toLowerCase());
+
         
         db.savedCards.unshift({
             id: Date.now(),
@@ -838,272 +838,277 @@
     async function decryptData(encryptedBase64, key) { const encryptedData = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0)); const iv = encryptedData.slice(0, 12); const data = encryptedData.slice(12); const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, data); return JSON.parse(new TextDecoder().decode(decrypted)); }
     async function saveDb() { if (!cryptoKey) return; const encrypted = await encryptData(db, cryptoKey); localStorage.setItem('medcard_encrypted_v2', encrypted); }
     async function loadDb(password, salt) { const encrypted = localStorage.getItem('medcard_encrypted_v2'); if (!encrypted) throw new Error('No database'); const key = await deriveKey(password, salt); db = await decryptData(encrypted, key); cryptoKey = key; return true; }
-    async function createNewDb(password) { const salt = crypto.getRandomValues(new Uint8Array(32)); const key = await deriveKey(password, salt); db = { savedUsers: [], savedHospitals: [], savedCards: [], globalLogo: null, settings: { lastLayout: DEFAULT_LAYOUT } }; const encrypted = await encryptData(db, key); localStorage.setItem('medcard_encrypted_v2', encrypted); localStorage.setItem('medcard_salt', btoa(String.fromCharCode.apply(null, salt))); cryptoKey = key; }
+    async function createNewDb(password) { const salt = crypto.getRandomValues(new Uint8Array(32)); const key = await deriveKey(password, salt); db = { savedUsers: [], savedHospitals: [], savedCards: [], globalLogo: null, settings: { lastLayout: 2 } }; const encrypted = await encryptData(db, key); localStorage.setItem('medcard_encrypted_v2', encrypted); localStorage.setItem('medcard_salt', btoa(String.fromCharCode.apply(null, salt))); cryptoKey = key; }
     function getStoredSalt() { const saltBase64 = localStorage.getItem('medcard_salt'); return saltBase64 ? Uint8Array.from(atob(saltBase64), c=>c.charCodeAt(0)) : null; }
     function databaseExists() { return localStorage.getItem('medcard_encrypted_v2') !== null; }
     
-    async function initApp() {
-        populateSpecialties();
-        globalLogo = db.globalLogo;
-        if(globalLogo && document.getElementById('logoPreview')) { 
-            document.getElementById('logoPreview').src = globalLogo; 
-            document.getElementById('logoPreview').style.display = 'block'; 
-            document.getElementById('logoPlaceholder').style.display = 'none'; 
-            document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
-        }
-        
-        // ============ LAYOUT SELECTOR - FIXED ============
-        const layoutOptions = document.querySelectorAll('.layout-option');
-        // Remove ALL selected classes first
-        layoutOptions.forEach(o => o.classList.remove('selected'));
-        
-        // Set the correct layout from DEFAULT_LAYOUT
-        currentLayout = DEFAULT_LAYOUT;
-        
-        // Update db settings
-        db.settings.lastLayout = DEFAULT_LAYOUT;
-        await saveDb();
-        
-        // Select ONLY the matching layout option
-        layoutOptions.forEach(opt => {
-            if (parseInt(opt.dataset.layout) === currentLayout) {
-                opt.classList.add('selected');
-            }
-            opt.onclick = () => {
-                layoutOptions.forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
-                currentLayout = parseInt(opt.dataset.layout);
-                db.settings.lastLayout = currentLayout;
-                saveDb();
-                renderCards();
-            };
-        });
-        
-        // Initialize card data
-        for(let i = 0; i < 8; i++) cardData[i] = {};
-        renderCards(); 
-        renderSavedCardsList(); 
-        renderGlobalSavedItems();
-        document.getElementById('savedCount').innerText = `(${db.savedCards.length})`;
-        document.getElementById('dbStatus').innerHTML = "🔒 WebCrypto AES-GCM | ❌ X limpa card individual";
-        setupAllDropdowns();
-        
-        // ============ SAVE SET MODAL ============
-        const saveSetModal = document.getElementById('saveSetModal');
-        const setNameInput = document.getElementById('setName');
+   
+   // ==================== DEFAULT LAYOUT ====================
+const DEFAULT_LAYOUT = 4; // Change this to 1, 2, 4, 6, or 8
 
-        document.getElementById('confirmSaveSetBtn').onclick = function(e) {
-            e.preventDefault();
-            saveCurrentSet();
-        };
-
-        document.getElementById('cancelSaveSetBtn').onclick = function(e) {
-            e.preventDefault();
-            saveSetModal.style.display = 'none';
-            setNameInput.value = '';
-        };
-
-        setNameInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                e.stopPropagation();
-                saveCurrentSet();
-            }
-        });
-
-        saveSetModal.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopPropagation();
-                this.style.display = 'none';
-                setNameInput.value = '';
-            }
-        });
-
-        saveSetModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-                setNameInput.value = '';
-            }
-        });
-
-        document.getElementById('saveSetBtn').onclick = () => {
-            saveSetModal.style.display = 'flex';
-            setNameInput.value = '';
-            setTimeout(() => setNameInput.focus(), 100);
-        };
-
-        // ============ OTHER BUTTONS ============
-        document.getElementById('resetBtn').onclick = resetAll;
-        document.getElementById('pdfBtn').onclick = generatePDF;
-        document.getElementById('printBtn').onclick = printPreview;
-        document.getElementById('imageBtn').onclick = downloadImage;
-        document.getElementById('excelExportBtn').onclick = exportToExcel;
-        document.getElementById('clearAllDataBtn').onclick = deleteAllData;
-        document.getElementById('cleanSystemBtn').onclick = cleanSystem;
-        document.getElementById('toggleSavedBtn').onclick = () => document.getElementById('savedSection').classList.toggle('active');
-        
-        document.getElementById('savePacientBtn').onclick = saveAndApplyUser;
-        document.getElementById('saveHospitalBtn').onclick = saveAndApplyHospital;
-        
-        document.getElementById('modalSaveBtn').onclick = saveModalEdit;
-        document.getElementById('modalCancelBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
-        document.getElementById('modalCloseBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
-        
-        document.getElementById('confirmSaveItemBtn').onclick = confirmSaveItem;
-        document.getElementById('cancelSaveItemBtn').onclick = () => document.getElementById('saveItemModal').style.display = 'none';
-        
-        document.getElementById('saveItemAlias').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                confirmSaveItem();
-            }
-        });
-        document.getElementById('saveItemValue').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                confirmSaveItem();
-            }
-        });
-
-        document.getElementById('confirmEditSavedItemBtn').onclick = saveEditedSavedItem;
-        document.getElementById('cancelEditSavedItemBtn').onclick = () => document.getElementById('editSavedItemModal').style.display = 'none';
-        
-        document.getElementById('editSavedItemAlias').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                saveEditedSavedItem();
-            }
-        });
-        document.getElementById('editSavedItemValue').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                saveEditedSavedItem();
-            }
-        });
-
-        document.getElementById('modalSavePacientBtn').onclick = () => { 
-            let v = document.getElementById('modalPacient').value; 
-            if(v) { 
-                document.getElementById('saveItemAlias').value = v.split(' ')[0]; 
-                document.getElementById('saveItemValue').value = v; 
-                document.getElementById('saveItemModal').style.display = 'flex'; 
-                window.pendingSaveType = 'user'; 
-            } 
-        };
-        document.getElementById('modalSaveHospitalBtn').onclick = () => { 
-            let v = document.getElementById('modalHospital').value; 
-            if(v) { 
-                document.getElementById('saveItemAlias').value = v.split(',')[0].substring(0,25); 
-                document.getElementById('saveItemValue').value = v; 
-                document.getElementById('saveItemModal').style.display = 'flex'; 
-                window.pendingSaveType = 'hospital'; 
-            } 
-        };
-        
-        document.getElementById('logoPlaceholder').onclick = () => document.getElementById('logoUpload').click();
-        document.getElementById('logoUpload').onchange = (e) => { 
-            const f = e.target.files[0]; 
-            if(f) { 
-                const r = new FileReader(); 
-                r.onload = ev => { 
-                    globalLogo = ev.target.result; 
-                    db.globalLogo = globalLogo; 
-                    saveDb(); 
-                    document.getElementById('logoPreview').src = globalLogo; 
-                    document.getElementById('logoPreview').style.display = 'block'; 
-                    document.getElementById('logoPlaceholder').style.display = 'none'; 
-                    document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
-                    renderCards(); 
-                    showMessage('Logo adicionado!'); 
-                }; 
-                r.readAsDataURL(f); 
-            } 
-        };
-        document.getElementById('removeLogoBtn').onclick = () => { 
-            globalLogo = null; 
-            db.globalLogo = null; 
-            saveDb(); 
-            document.getElementById('logoPreview').style.display = 'none'; 
-            document.getElementById('logoPlaceholder').style.display = 'block'; 
-            document.getElementById('removeLogoBtn').style.display = 'none'; 
-            renderCards(); 
-        };
-        
-        document.getElementById('exportDbBtn').onclick = async () => { 
-            const encrypted = await encryptData(db, cryptoKey); 
-            const exportData = { version: 2, salt: localStorage.getItem('medcard_salt'), data: encrypted }; 
-            const blob = new Blob([JSON.stringify(exportData)], {type: 'application/json'}); 
-            const a = document.createElement('a'); 
-            a.href = URL.createObjectURL(blob); 
-            a.download = `medcard_backup_${Date.now()}.json`; 
-            a.click(); 
-            showMessage('Database exportado!'); 
-        };
-        document.getElementById('importDbBtn').onclick = () => document.getElementById('importDbFile').click();
-        document.getElementById('importDbFile').onchange = async (e) => { 
-            const file = e.target.files[0]; 
-            if(file) { 
-                const reader = new FileReader(); 
-                reader.onload = async (ev) => { 
-                    const password = prompt('Digite a senha do database importado:'); 
-                    if(password) { 
-                        try { 
-                            const importObj = JSON.parse(ev.target.result); 
-                            const salt = Uint8Array.from(atob(importObj.salt), c=>c.charCodeAt(0)); 
-                            const key = await deriveKey(password, salt); 
-                            const importedDb = await decryptData(importObj.data, key); 
-                            db = importedDb; 
-                            cryptoKey = key; 
-                            localStorage.setItem('medcard_encrypted_v2', importObj.data); 
-                            localStorage.setItem('medcard_salt', importObj.salt); 
-                            location.reload(); 
-                        } catch(err) { 
-                            alert('Erro: ' + err.message); 
-                        } 
-                    } 
-                }; 
-                reader.readAsText(file); 
-            } 
-        };
-        
-        document.getElementById('globalPacient').addEventListener('custom-save', saveAndApplyUser);
-        document.getElementById('globalHospital').addEventListener('custom-save', saveAndApplyHospital);
-        document.getElementById('globalDate').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                applyDate(document.getElementById('globalDate').value); 
-            } 
-        });
-        document.getElementById('globalHour').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                applyTime(document.getElementById('globalHour').value); 
-            } 
-        });
-        document.getElementById('global-speciality').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                applySpecialty(document.getElementById('global-speciality').value); 
-            } 
-        });
-        document.getElementById('global-speciality').onchange = (e) => applySpecialty(e.target.value);
-        document.getElementById('globalDate').onchange = (e) => applyDate(e.target.value);
-        document.getElementById('globalHour').onchange = (e) => applyTime(e.target.value);
-        
-        document.addEventListener('keydown', (e) => { 
-            if(e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay:not(#saveSetModal)').forEach(m => m.style.display = 'none');
-            }
-        });
-        
-        document.querySelectorAll('.lang-btn').forEach(btn => { 
-            btn.addEventListener('click', () => { 
-                updateLanguage(btn.dataset.lang); 
-            }); 
-        });
-        updateLanguage('pt');
+async function initApp() {
+    populateSpecialties();
+    globalLogo = db.globalLogo;
+    if(globalLogo && document.getElementById('logoPreview')) { 
+        document.getElementById('logoPreview').src = globalLogo; 
+        document.getElementById('logoPreview').style.display = 'block'; 
+        document.getElementById('logoPlaceholder').style.display = 'none'; 
+        document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
     }
+    
+    // ============ LAYOUT SELECTOR ============
+    const layoutOptions = document.querySelectorAll('.layout-option');
+    // Remove all selected classes first
+    layoutOptions.forEach(o => o.classList.remove('selected'));
+
+    // Set the correct layout from DEFAULT_LAYOUT
+    currentLayout = DEFAULT_LAYOUT;
+
+    // Also save it to db if it's different
+    if (db.settings.lastLayout !== DEFAULT_LAYOUT) {
+        db.settings.lastLayout = DEFAULT_LAYOUT;
+        saveDb();
+    }
+
+    // Find and select the matching layout option
+    layoutOptions.forEach(opt => {
+        if (parseInt(opt.dataset.layout) === currentLayout) {
+            opt.classList.add('selected');
+        }
+        opt.onclick = () => {
+            layoutOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            currentLayout = parseInt(opt.dataset.layout);
+            db.settings.lastLayout = currentLayout;
+            saveDb();
+            renderCards();
+        };
+    });
+    
+    for(let i = 0; i < 8; i++) cardData[i] = {};
+    renderCards(); 
+    renderSavedCardsList(); 
+    renderGlobalSavedItems();
+    document.getElementById('savedCount').innerText = `(${db.savedCards.length})`;
+    document.getElementById('dbStatus').innerHTML = "🔒 WebCrypto AES-GCM | ❌ X limpa card individual";
+    setupAllDropdowns();
+    
+    // ============ SAVE SET MODAL ============
+    const saveSetModal = document.getElementById('saveSetModal');
+    const setNameInput = document.getElementById('setName');
+
+    document.getElementById('confirmSaveSetBtn').onclick = function(e) {
+        e.preventDefault();
+        saveCurrentSet();
+    };
+
+    document.getElementById('cancelSaveSetBtn').onclick = function(e) {
+        e.preventDefault();
+        saveSetModal.style.display = 'none';
+        setNameInput.value = '';
+    };
+
+    setNameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            saveCurrentSet();
+        }
+    });
+
+    saveSetModal.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.display = 'none';
+            setNameInput.value = '';
+        }
+    });
+
+    saveSetModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+            setNameInput.value = '';
+        }
+    });
+
+    document.getElementById('saveSetBtn').onclick = () => {
+        saveSetModal.style.display = 'flex';
+        setNameInput.value = '';
+        setTimeout(() => setNameInput.focus(), 100);
+    };
+
+    // ============ OTHER BUTTONS ============
+    document.getElementById('resetBtn').onclick = resetAll;
+    document.getElementById('pdfBtn').onclick = generatePDF;
+    document.getElementById('printBtn').onclick = printPreview;
+    document.getElementById('imageBtn').onclick = downloadImage;
+    document.getElementById('excelExportBtn').onclick = exportToExcel;
+    document.getElementById('clearAllDataBtn').onclick = deleteAllData;
+    document.getElementById('cleanSystemBtn').onclick = cleanSystem;
+    document.getElementById('toggleSavedBtn').onclick = () => document.getElementById('savedSection').classList.toggle('active');
+    
+    document.getElementById('savePacientBtn').onclick = saveAndApplyUser;
+    document.getElementById('saveHospitalBtn').onclick = saveAndApplyHospital;
+    
+    document.getElementById('modalSaveBtn').onclick = saveModalEdit;
+    document.getElementById('modalCancelBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
+    document.getElementById('modalCloseBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
+    
+    document.getElementById('confirmSaveItemBtn').onclick = confirmSaveItem;
+    document.getElementById('cancelSaveItemBtn').onclick = () => document.getElementById('saveItemModal').style.display = 'none';
+    
+    document.getElementById('saveItemAlias').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            confirmSaveItem();
+        }
+    });
+    document.getElementById('saveItemValue').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            confirmSaveItem();
+        }
+    });
+
+    document.getElementById('confirmEditSavedItemBtn').onclick = saveEditedSavedItem;
+    document.getElementById('cancelEditSavedItemBtn').onclick = () => document.getElementById('editSavedItemModal').style.display = 'none';
+    
+    document.getElementById('editSavedItemAlias').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            saveEditedSavedItem();
+        }
+    });
+    document.getElementById('editSavedItemValue').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            saveEditedSavedItem();
+        }
+    });
+
+    document.getElementById('modalSavePacientBtn').onclick = () => { 
+        let v = document.getElementById('modalPacient').value; 
+        if(v) { 
+            document.getElementById('saveItemAlias').value = v.split(' ')[0]; 
+            document.getElementById('saveItemValue').value = v; 
+            document.getElementById('saveItemModal').style.display = 'flex'; 
+            window.pendingSaveType = 'user'; 
+        } 
+    };
+    document.getElementById('modalSaveHospitalBtn').onclick = () => { 
+        let v = document.getElementById('modalHospital').value; 
+        if(v) { 
+            document.getElementById('saveItemAlias').value = v.split(',')[0].substring(0,25); 
+            document.getElementById('saveItemValue').value = v; 
+            document.getElementById('saveItemModal').style.display = 'flex'; 
+            window.pendingSaveType = 'hospital'; 
+        } 
+    };
+    
+    document.getElementById('logoPlaceholder').onclick = () => document.getElementById('logoUpload').click();
+    document.getElementById('logoUpload').onchange = (e) => { 
+        const f = e.target.files[0]; 
+        if(f) { 
+            const r = new FileReader(); 
+            r.onload = ev => { 
+                globalLogo = ev.target.result; 
+                db.globalLogo = globalLogo; 
+                saveDb(); 
+                document.getElementById('logoPreview').src = globalLogo; 
+                document.getElementById('logoPreview').style.display = 'block'; 
+                document.getElementById('logoPlaceholder').style.display = 'none'; 
+                document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
+                renderCards(); 
+                showMessage('Logo adicionado!'); 
+            }; 
+            r.readAsDataURL(f); 
+        } 
+    };
+    document.getElementById('removeLogoBtn').onclick = () => { 
+        globalLogo = null; 
+        db.globalLogo = null; 
+        saveDb(); 
+        document.getElementById('logoPreview').style.display = 'none'; 
+        document.getElementById('logoPlaceholder').style.display = 'block'; 
+        document.getElementById('removeLogoBtn').style.display = 'none'; 
+        renderCards(); 
+    };
+    
+    document.getElementById('exportDbBtn').onclick = async () => { 
+        const encrypted = await encryptData(db, cryptoKey); 
+        const exportData = { version: 2, salt: localStorage.getItem('medcard_salt'), data: encrypted }; 
+        const blob = new Blob([JSON.stringify(exportData)], {type: 'application/json'}); 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = `medcard_backup_${Date.now()}.json`; 
+        a.click(); 
+        showMessage('Database exportado!'); 
+    };
+    document.getElementById('importDbBtn').onclick = () => document.getElementById('importDbFile').click();
+    document.getElementById('importDbFile').onchange = async (e) => { 
+        const file = e.target.files[0]; 
+        if(file) { 
+            const reader = new FileReader(); 
+            reader.onload = async (ev) => { 
+                const password = prompt('Digite a senha do database importado:'); 
+                if(password) { 
+                    try { 
+                        const importObj = JSON.parse(ev.target.result); 
+                        const salt = Uint8Array.from(atob(importObj.salt), c=>c.charCodeAt(0)); 
+                        const key = await deriveKey(password, salt); 
+                        const importedDb = await decryptData(importObj.data, key); 
+                        db = importedDb; 
+                        cryptoKey = key; 
+                        localStorage.setItem('medcard_encrypted_v2', importObj.data); 
+                        localStorage.setItem('medcard_salt', importObj.salt); 
+                        location.reload(); 
+                    } catch(err) { 
+                        alert('Erro: ' + err.message); 
+                    } 
+                } 
+            }; 
+            reader.readAsText(file); 
+        } 
+    };
+    
+    document.getElementById('globalPacient').addEventListener('custom-save', saveAndApplyUser);
+    document.getElementById('globalHospital').addEventListener('custom-save', saveAndApplyHospital);
+    document.getElementById('globalDate').addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') { 
+            e.preventDefault(); 
+            applyDate(document.getElementById('globalDate').value); 
+        } 
+    });
+    document.getElementById('globalHour').addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') { 
+            e.preventDefault(); 
+            applyTime(document.getElementById('globalHour').value); 
+        } 
+    });
+    document.getElementById('global-speciality').addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') { 
+            e.preventDefault(); 
+            applySpecialty(document.getElementById('global-speciality').value); 
+        } 
+    });
+    document.getElementById('global-speciality').onchange = (e) => applySpecialty(e.target.value);
+    document.getElementById('globalDate').onchange = (e) => applyDate(e.target.value);
+    document.getElementById('globalHour').onchange = (e) => applyTime(e.target.value);
+    
+    document.addEventListener('keydown', (e) => { 
+        if(e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay:not(#saveSetModal)').forEach(m => m.style.display = 'none');
+        }
+    });
+    
+    document.querySelectorAll('.lang-btn').forEach(btn => { 
+        btn.addEventListener('click', () => { 
+            updateLanguage(btn.dataset.lang); 
+        }); 
+    });
+    updateLanguage('pt');
+}
     
     function updateLanguage(lang) { currentLang=lang; const t=translations[lang]; document.getElementById('appTitle').innerHTML=t.appTitle; document.getElementById('appSubtitle').innerHTML=t.appSubtitle; document.getElementById('settingsTitle').innerHTML=t.settingsTitle; document.getElementById('savedSetsText').innerHTML=t.savedSetsText; document.getElementById('layoutLabel').innerHTML=t.layoutLabel; document.getElementById('patientLabel').innerHTML=t.patientLabel; document.getElementById('hospitalLabel').innerHTML=t.hospitalLabel; document.getElementById('specialityLabel').innerHTML=t.specialityLabel; document.getElementById('dateLabel').innerHTML=t.dateLabel; document.getElementById('timeLabel').innerHTML=t.timeLabel; document.getElementById('logoLabel').innerHTML=t.logoLabel; document.getElementById('previewTitle').innerHTML=t.previewTitle; document.getElementById('editCardTitle').innerHTML=t.editCardTitle+' <span id="modalCardNum">1</span>'; document.getElementById('modalPatientLabel').innerHTML=t.modalPatientLabel; document.getElementById('modalHospitalLabel').innerHTML=t.modalHospitalLabel; document.getElementById('modalSpecialityLabel').innerHTML=t.modalSpecialityLabel; document.getElementById('modalDateLabel').innerHTML=t.modalDateLabel; document.getElementById('modalTimeLabel').innerHTML=t.modalTimeLabel; document.getElementById('modalHint').innerHTML=t.modalHint; document.getElementById('saveSetModalTitle').innerHTML=t.saveSetModalTitle; document.getElementById('setNameLabel').innerHTML=t.setNameLabel; document.getElementById('saveItemModalTitle').innerHTML=t.saveItemModalTitle; document.getElementById('saveItemAliasLabel').innerHTML=t.saveItemAliasLabel; document.getElementById('saveItemValueLabel').innerHTML=t.saveItemValueLabel; document.getElementById('editSavedItemTitle').innerHTML=t.editSavedItemTitle; document.getElementById('editSavedItemAliasLabel').innerHTML=t.editSavedItemAliasLabel; document.getElementById('editSavedItemValueLabel').innerHTML=t.editSavedItemValueLabel; document.getElementById('dangerZoneTitle').innerHTML=t.dangerZoneTitle; document.getElementById('savedSetsTitle').innerHTML=t.savedSetsTitle; document.querySelectorAll('.lang-btn').forEach(btn=>{ if(btn.dataset.lang===lang) btn.classList.add('active'); else btn.classList.remove('active'); }); renderCards(); }
     
@@ -1111,59 +1116,11 @@
         const overlay = document.createElement('div'); overlay.className = 'password-prompt';
         overlay.innerHTML = `<div class="password-box"><h2>🔐 MedCard Pro v28</h2><p>WebCrypto AES-GCM + PBKDF2</p><p><strong>❌ Clique no X para limpar cada card</strong></p><input type="password" id="pwdInput" placeholder="Digite sua senha"><button id="unlockBtn" class="button secondary">🔓 Desbloquear</button><button id="newDbBtn" class="button">🆕 Criar Novo Banco</button><div class="security-badge">🔒 Nenhuma senha é armazenada</div></div>`;
         document.body.appendChild(overlay);
-        document.getElementById('unlockBtn').onclick = async () => { 
-            const password = document.getElementById('pwdInput').value; 
-            if(!password) return; 
-            try { 
-                const salt = getStoredSalt(); 
-                if(!salt) throw new Error('No salt'); 
-                await loadDb(password, salt); 
-                overlay.remove(); 
-                document.getElementById('mainApp').style.display = 'block';
-                initApp(); 
-                showMessage('✅ Desbloqueado! Cards com botão X!'); 
-            } catch(e) { 
-                alert('Senha incorreta!'); 
-                document.getElementById('pwdInput').value = ''; 
-            } 
-        };
-        document.getElementById('pwdInput').addEventListener('keydown', async (e) => { 
-            if(e.key === 'Enter') { 
-                const password = document.getElementById('pwdInput').value; 
-                if(!password) return; 
-                try { 
-                    const salt = getStoredSalt(); 
-                    await loadDb(password, salt); 
-                    overlay.remove(); 
-                    document.getElementById('mainApp').style.display = 'block';
-                    initApp(); 
-                    showMessage('✅ Desbloqueado!'); 
-                } catch(e) { 
-                    alert('Senha incorreta!'); 
-                    document.getElementById('pwdInput').value = ''; 
-                } 
-            } 
-        });
-        document.getElementById('newDbBtn').onclick = async () => { 
-            const password = prompt('Digite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA!'); 
-            if(password && password.length>=4) { 
-                const confirmPwd = prompt('Confirme a senha:'); 
-                if(password===confirmPwd) { 
-                    await createNewDb(password); 
-                    overlay.remove(); 
-                    document.getElementById('mainApp').style.display = 'block';
-                    initApp(); 
-                    showMessage('✅ Novo banco criado com botão X!'); 
-                } else alert('Senhas não coincidem!'); 
-            } else alert('Senha deve ter no mínimo 4 caracteres!'); 
-        };
+        document.getElementById('unlockBtn').onclick = async () => { const password = document.getElementById('pwdInput').value; if(!password) return; try { const salt = getStoredSalt(); if(!salt) throw new Error('No salt'); await loadDb(password, salt); overlay.remove(); initApp(); showMessage('✅ Desbloqueado! Cards com botão X!'); } catch(e) { alert('Senha incorreta!'); document.getElementById('pwdInput').value = ''; } };
+        document.getElementById('pwdInput').addEventListener('keydown', async (e) => { if(e.key === 'Enter') { const password = document.getElementById('pwdInput').value; if(!password) return; try { const salt = getStoredSalt(); await loadDb(password, salt); overlay.remove(); initApp(); showMessage('✅ Desbloqueado!'); } catch(e) { alert('Senha incorreta!'); document.getElementById('pwdInput').value = ''; } } });
+        document.getElementById('newDbBtn').onclick = async () => { const password = prompt('Digite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA!'); if(password && password.length>=4) { const confirmPwd = prompt('Confirme a senha:'); if(password===confirmPwd) { await createNewDb(password); overlay.remove(); initApp(); showMessage('✅ Novo banco criado com botão X!'); } else alert('Senhas não coincidem!'); } else alert('Senha deve ter no mínimo 4 caracteres!'); };
     }
-    
-    if (databaseExists()) {
-        showPasswordPrompt();
-    } else {
-        showPasswordPrompt();
-    }
+    if (databaseExists()) showPasswordPrompt(); else showPasswordPrompt();
 </script>
 </body>
 </html>
