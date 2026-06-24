@@ -762,7 +762,9 @@
             return; 
         }
         
-            
+        db.savedCards = db.savedCards.filter(c => c.name.toLowerCase() !== name.toLowerCase());
+
+        
         db.savedCards.unshift({
             id: Date.now(),
             name: name,
@@ -827,251 +829,273 @@
     function getStoredSalt() { const saltBase64 = localStorage.getItem('medcard_salt'); return saltBase64 ? Uint8Array.from(atob(saltBase64), c=>c.charCodeAt(0)) : null; }
     function databaseExists() { return localStorage.getItem('medcard_encrypted_v2') !== null; }
     
-    async function initApp() {
-        populateSpecialties();
-        globalLogo = db.globalLogo;
-        if(globalLogo && document.getElementById('logoPreview')) { 
-            document.getElementById('logoPreview').src = globalLogo; 
-            document.getElementById('logoPreview').style.display = 'block'; 
-            document.getElementById('logoPlaceholder').style.display = 'none'; 
-            document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
-        }
-        currentLayout = db.settings.lastLayout || 2;
-        document.querySelectorAll('.layout-option').forEach(opt => { 
-            if(parseInt(opt.dataset.layout) === currentLayout) opt.classList.add('selected'); 
-            opt.onclick = () => { 
-                document.querySelectorAll('.layout-option').forEach(o => o.classList.remove('selected')); 
-                opt.classList.add('selected'); 
-                currentLayout = parseInt(opt.dataset.layout); 
-                db.settings.lastLayout = currentLayout; 
-                saveDb(); 
-                renderCards(); 
-            }; 
-        });
-        for(let i = 0; i < 8; i++) cardData[i] = {};
-        renderCards(); 
-        renderSavedCardsList(); 
-        renderGlobalSavedItems();
-        document.getElementById('savedCount').innerText = `(${db.savedCards.length})`;
-        document.getElementById('dbStatus').innerHTML = "🔒 WebCrypto AES-GCM | ❌ X limpa card individual";
-        setupAllDropdowns();
-        
-        // ============ SAVE SET MODAL ============
-        const saveSetModal = document.getElementById('saveSetModal');
-        const setNameInput = document.getElementById('setName');
+   
+   // ==================== DEFAULT LAYOUT ====================
+const DEFAULT_LAYOUT = 4; // Change this to 1, 2, 4, 6, or 8
 
-        document.getElementById('confirmSaveSetBtn').onclick = function(e) {
-            e.preventDefault();
-            saveCurrentSet();
-        };
-
-        document.getElementById('cancelSaveSetBtn').onclick = function(e) {
-            e.preventDefault();
-            saveSetModal.style.display = 'none';
-            setNameInput.value = '';
-        };
-
-        setNameInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                e.stopPropagation();
-                saveCurrentSet();
-            }
-        });
-
-        saveSetModal.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopPropagation();
-                this.style.display = 'none';
-                setNameInput.value = '';
-            }
-        });
-
-        saveSetModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-                setNameInput.value = '';
-            }
-        });
-
-        document.getElementById('saveSetBtn').onclick = () => {
-            saveSetModal.style.display = 'flex';
-            setNameInput.value = '';
-            setTimeout(() => setNameInput.focus(), 100);
-        };
-
-        // ============ OTHER BUTTONS ============
-        document.getElementById('resetBtn').onclick = resetAll;
-        document.getElementById('pdfBtn').onclick = generatePDF;
-        document.getElementById('printBtn').onclick = printPreview;
-        document.getElementById('imageBtn').onclick = downloadImage;
-        document.getElementById('excelExportBtn').onclick = exportToExcel;
-        document.getElementById('clearAllDataBtn').onclick = deleteAllData;
-        document.getElementById('cleanSystemBtn').onclick = cleanSystem;
-        document.getElementById('toggleSavedBtn').onclick = () => document.getElementById('savedSection').classList.toggle('active');
-        
-        document.getElementById('savePacientBtn').onclick = saveAndApplyUser;
-        document.getElementById('saveHospitalBtn').onclick = saveAndApplyHospital;
-        
-        document.getElementById('modalSaveBtn').onclick = saveModalEdit;
-        document.getElementById('modalCancelBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
-        document.getElementById('modalCloseBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
-        
-        document.getElementById('confirmSaveItemBtn').onclick = confirmSaveItem;
-        document.getElementById('cancelSaveItemBtn').onclick = () => document.getElementById('saveItemModal').style.display = 'none';
-        
-        document.getElementById('saveItemAlias').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                confirmSaveItem();
-            }
-        });
-        document.getElementById('saveItemValue').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                confirmSaveItem();
-            }
-        });
-
-        document.getElementById('confirmEditSavedItemBtn').onclick = saveEditedSavedItem;
-        document.getElementById('cancelEditSavedItemBtn').onclick = () => document.getElementById('editSavedItemModal').style.display = 'none';
-        
-        document.getElementById('editSavedItemAlias').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                saveEditedSavedItem();
-            }
-        });
-        document.getElementById('editSavedItemValue').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                saveEditedSavedItem();
-            }
-        });
-
-        document.getElementById('modalSavePacientBtn').onclick = () => { 
-            let v = document.getElementById('modalPacient').value; 
-            if(v) { 
-                document.getElementById('saveItemAlias').value = v.split(' ')[0]; 
-                document.getElementById('saveItemValue').value = v; 
-                document.getElementById('saveItemModal').style.display = 'flex'; 
-                window.pendingSaveType = 'user'; 
-            } 
-        };
-        document.getElementById('modalSaveHospitalBtn').onclick = () => { 
-            let v = document.getElementById('modalHospital').value; 
-            if(v) { 
-                document.getElementById('saveItemAlias').value = v.split(',')[0].substring(0,25); 
-                document.getElementById('saveItemValue').value = v; 
-                document.getElementById('saveItemModal').style.display = 'flex'; 
-                window.pendingSaveType = 'hospital'; 
-            } 
-        };
-        
-        document.getElementById('logoPlaceholder').onclick = () => document.getElementById('logoUpload').click();
-        document.getElementById('logoUpload').onchange = (e) => { 
-            const f = e.target.files[0]; 
-            if(f) { 
-                const r = new FileReader(); 
-                r.onload = ev => { 
-                    globalLogo = ev.target.result; 
-                    db.globalLogo = globalLogo; 
-                    saveDb(); 
-                    document.getElementById('logoPreview').src = globalLogo; 
-                    document.getElementById('logoPreview').style.display = 'block'; 
-                    document.getElementById('logoPlaceholder').style.display = 'none'; 
-                    document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
-                    renderCards(); 
-                    showMessage('Logo adicionado!'); 
-                }; 
-                r.readAsDataURL(f); 
-            } 
-        };
-        document.getElementById('removeLogoBtn').onclick = () => { 
-            globalLogo = null; 
-            db.globalLogo = null; 
-            saveDb(); 
-            document.getElementById('logoPreview').style.display = 'none'; 
-            document.getElementById('logoPlaceholder').style.display = 'block'; 
-            document.getElementById('removeLogoBtn').style.display = 'none'; 
-            renderCards(); 
-        };
-        
-        document.getElementById('exportDbBtn').onclick = async () => { 
-            const encrypted = await encryptData(db, cryptoKey); 
-            const exportData = { version: 2, salt: localStorage.getItem('medcard_salt'), data: encrypted }; 
-            const blob = new Blob([JSON.stringify(exportData)], {type: 'application/json'}); 
-            const a = document.createElement('a'); 
-            a.href = URL.createObjectURL(blob); 
-            a.download = `medcard_backup_${Date.now()}.json`; 
-            a.click(); 
-            showMessage('Database exportado!'); 
-        };
-        document.getElementById('importDbBtn').onclick = () => document.getElementById('importDbFile').click();
-        document.getElementById('importDbFile').onchange = async (e) => { 
-            const file = e.target.files[0]; 
-            if(file) { 
-                const reader = new FileReader(); 
-                reader.onload = async (ev) => { 
-                    const password = prompt('Digite a senha do database importado:'); 
-                    if(password) { 
-                        try { 
-                            const importObj = JSON.parse(ev.target.result); 
-                            const salt = Uint8Array.from(atob(importObj.salt), c=>c.charCodeAt(0)); 
-                            const key = await deriveKey(password, salt); 
-                            const importedDb = await decryptData(importObj.data, key); 
-                            db = importedDb; 
-                            cryptoKey = key; 
-                            localStorage.setItem('medcard_encrypted_v2', importObj.data); 
-                            localStorage.setItem('medcard_salt', importObj.salt); 
-                            location.reload(); 
-                        } catch(err) { 
-                            alert('Erro: ' + err.message); 
-                        } 
-                    } 
-                }; 
-                reader.readAsText(file); 
-            } 
-        };
-        
-        document.getElementById('globalPacient').addEventListener('custom-save', saveAndApplyUser);
-        document.getElementById('globalHospital').addEventListener('custom-save', saveAndApplyHospital);
-        document.getElementById('globalDate').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                applyDate(document.getElementById('globalDate').value); 
-            } 
-        });
-        document.getElementById('globalHour').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                applyTime(document.getElementById('globalHour').value); 
-            } 
-        });
-        document.getElementById('global-speciality').addEventListener('keypress', (e) => { 
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                applySpecialty(document.getElementById('global-speciality').value); 
-            } 
-        });
-        document.getElementById('global-speciality').onchange = (e) => applySpecialty(e.target.value);
-        document.getElementById('globalDate').onchange = (e) => applyDate(e.target.value);
-        document.getElementById('globalHour').onchange = (e) => applyTime(e.target.value);
-        
-        document.addEventListener('keydown', (e) => { 
-            if(e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay:not(#saveSetModal)').forEach(m => m.style.display = 'none');
-            }
-        });
-        
-        document.querySelectorAll('.lang-btn').forEach(btn => { 
-            btn.addEventListener('click', () => { 
-                updateLanguage(btn.dataset.lang); 
-            }); 
-        });
-        updateLanguage('pt');
+async function initApp() {
+    populateSpecialties();
+    globalLogo = db.globalLogo;
+    if(globalLogo && document.getElementById('logoPreview')) { 
+        document.getElementById('logoPreview').src = globalLogo; 
+        document.getElementById('logoPreview').style.display = 'block'; 
+        document.getElementById('logoPlaceholder').style.display = 'none'; 
+        document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
     }
+    
+    // ============ LAYOUT SELECTOR ============
+    const layoutOptions = document.querySelectorAll('.layout-option');
+    // Remove all selected classes first
+    layoutOptions.forEach(o => o.classList.remove('selected'));
+
+    // Set the correct layout from DEFAULT_LAYOUT
+    currentLayout = DEFAULT_LAYOUT;
+
+    // Also save it to db if it's different
+    if (db.settings.lastLayout !== DEFAULT_LAYOUT) {
+        db.settings.lastLayout = DEFAULT_LAYOUT;
+        saveDb();
+    }
+
+    // Find and select the matching layout option
+    layoutOptions.forEach(opt => {
+        if (parseInt(opt.dataset.layout) === currentLayout) {
+            opt.classList.add('selected');
+        }
+        opt.onclick = () => {
+            layoutOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            currentLayout = parseInt(opt.dataset.layout);
+            db.settings.lastLayout = currentLayout;
+            saveDb();
+            renderCards();
+        };
+    });
+    
+    for(let i = 0; i < 8; i++) cardData[i] = {};
+    renderCards(); 
+    renderSavedCardsList(); 
+    renderGlobalSavedItems();
+    document.getElementById('savedCount').innerText = `(${db.savedCards.length})`;
+    document.getElementById('dbStatus').innerHTML = "🔒 WebCrypto AES-GCM | ❌ X limpa card individual";
+    setupAllDropdowns();
+    
+    // ============ SAVE SET MODAL ============
+    const saveSetModal = document.getElementById('saveSetModal');
+    const setNameInput = document.getElementById('setName');
+
+    document.getElementById('confirmSaveSetBtn').onclick = function(e) {
+        e.preventDefault();
+        saveCurrentSet();
+    };
+
+    document.getElementById('cancelSaveSetBtn').onclick = function(e) {
+        e.preventDefault();
+        saveSetModal.style.display = 'none';
+        setNameInput.value = '';
+    };
+
+    setNameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            saveCurrentSet();
+        }
+    });
+
+    saveSetModal.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.display = 'none';
+            setNameInput.value = '';
+        }
+    });
+
+    saveSetModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+            setNameInput.value = '';
+        }
+    });
+
+    document.getElementById('saveSetBtn').onclick = () => {
+        saveSetModal.style.display = 'flex';
+        setNameInput.value = '';
+        setTimeout(() => setNameInput.focus(), 100);
+    };
+
+    // ============ OTHER BUTTONS ============
+    document.getElementById('resetBtn').onclick = resetAll;
+    document.getElementById('pdfBtn').onclick = generatePDF;
+    document.getElementById('printBtn').onclick = printPreview;
+    document.getElementById('imageBtn').onclick = downloadImage;
+    document.getElementById('excelExportBtn').onclick = exportToExcel;
+    document.getElementById('clearAllDataBtn').onclick = deleteAllData;
+    document.getElementById('cleanSystemBtn').onclick = cleanSystem;
+    document.getElementById('toggleSavedBtn').onclick = () => document.getElementById('savedSection').classList.toggle('active');
+    
+    document.getElementById('savePacientBtn').onclick = saveAndApplyUser;
+    document.getElementById('saveHospitalBtn').onclick = saveAndApplyHospital;
+    
+    document.getElementById('modalSaveBtn').onclick = saveModalEdit;
+    document.getElementById('modalCancelBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
+    document.getElementById('modalCloseBtn').onclick = () => document.getElementById('editModal').style.display = 'none';
+    
+    document.getElementById('confirmSaveItemBtn').onclick = confirmSaveItem;
+    document.getElementById('cancelSaveItemBtn').onclick = () => document.getElementById('saveItemModal').style.display = 'none';
+    
+    document.getElementById('saveItemAlias').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            confirmSaveItem();
+        }
+    });
+    document.getElementById('saveItemValue').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            confirmSaveItem();
+        }
+    });
+
+    document.getElementById('confirmEditSavedItemBtn').onclick = saveEditedSavedItem;
+    document.getElementById('cancelEditSavedItemBtn').onclick = () => document.getElementById('editSavedItemModal').style.display = 'none';
+    
+    document.getElementById('editSavedItemAlias').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            saveEditedSavedItem();
+        }
+    });
+    document.getElementById('editSavedItemValue').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            saveEditedSavedItem();
+        }
+    });
+
+    document.getElementById('modalSavePacientBtn').onclick = () => { 
+        let v = document.getElementById('modalPacient').value; 
+        if(v) { 
+            document.getElementById('saveItemAlias').value = v.split(' ')[0]; 
+            document.getElementById('saveItemValue').value = v; 
+            document.getElementById('saveItemModal').style.display = 'flex'; 
+            window.pendingSaveType = 'user'; 
+        } 
+    };
+    document.getElementById('modalSaveHospitalBtn').onclick = () => { 
+        let v = document.getElementById('modalHospital').value; 
+        if(v) { 
+            document.getElementById('saveItemAlias').value = v.split(',')[0].substring(0,25); 
+            document.getElementById('saveItemValue').value = v; 
+            document.getElementById('saveItemModal').style.display = 'flex'; 
+            window.pendingSaveType = 'hospital'; 
+        } 
+    };
+    
+    document.getElementById('logoPlaceholder').onclick = () => document.getElementById('logoUpload').click();
+    document.getElementById('logoUpload').onchange = (e) => { 
+        const f = e.target.files[0]; 
+        if(f) { 
+            const r = new FileReader(); 
+            r.onload = ev => { 
+                globalLogo = ev.target.result; 
+                db.globalLogo = globalLogo; 
+                saveDb(); 
+                document.getElementById('logoPreview').src = globalLogo; 
+                document.getElementById('logoPreview').style.display = 'block'; 
+                document.getElementById('logoPlaceholder').style.display = 'none'; 
+                document.getElementById('removeLogoBtn').style.display = 'inline-block'; 
+                renderCards(); 
+                showMessage('Logo adicionado!'); 
+            }; 
+            r.readAsDataURL(f); 
+        } 
+    };
+    document.getElementById('removeLogoBtn').onclick = () => { 
+        globalLogo = null; 
+        db.globalLogo = null; 
+        saveDb(); 
+        document.getElementById('logoPreview').style.display = 'none'; 
+        document.getElementById('logoPlaceholder').style.display = 'block'; 
+        document.getElementById('removeLogoBtn').style.display = 'none'; 
+        renderCards(); 
+    };
+    
+    document.getElementById('exportDbBtn').onclick = async () => { 
+        const encrypted = await encryptData(db, cryptoKey); 
+        const exportData = { version: 2, salt: localStorage.getItem('medcard_salt'), data: encrypted }; 
+        const blob = new Blob([JSON.stringify(exportData)], {type: 'application/json'}); 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = `medcard_backup_${Date.now()}.json`; 
+        a.click(); 
+        showMessage('Database exportado!'); 
+    };
+    document.getElementById('importDbBtn').onclick = () => document.getElementById('importDbFile').click();
+    document.getElementById('importDbFile').onchange = async (e) => { 
+        const file = e.target.files[0]; 
+        if(file) { 
+            const reader = new FileReader(); 
+            reader.onload = async (ev) => { 
+                const password = prompt('Digite a senha do database importado:'); 
+                if(password) { 
+                    try { 
+                        const importObj = JSON.parse(ev.target.result); 
+                        const salt = Uint8Array.from(atob(importObj.salt), c=>c.charCodeAt(0)); 
+                        const key = await deriveKey(password, salt); 
+                        const importedDb = await decryptData(importObj.data, key); 
+                        db = importedDb; 
+                        cryptoKey = key; 
+                        localStorage.setItem('medcard_encrypted_v2', importObj.data); 
+                        localStorage.setItem('medcard_salt', importObj.salt); 
+                        location.reload(); 
+                    } catch(err) { 
+                        alert('Erro: ' + err.message); 
+                    } 
+                } 
+            }; 
+            reader.readAsText(file); 
+        } 
+    };
+    
+    document.getElementById('globalPacient').addEventListener('custom-save', saveAndApplyUser);
+    document.getElementById('globalHospital').addEventListener('custom-save', saveAndApplyHospital);
+    document.getElementById('globalDate').addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') { 
+            e.preventDefault(); 
+            applyDate(document.getElementById('globalDate').value); 
+        } 
+    });
+    document.getElementById('globalHour').addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') { 
+            e.preventDefault(); 
+            applyTime(document.getElementById('globalHour').value); 
+        } 
+    });
+    document.getElementById('global-speciality').addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') { 
+            e.preventDefault(); 
+            applySpecialty(document.getElementById('global-speciality').value); 
+        } 
+    });
+    document.getElementById('global-speciality').onchange = (e) => applySpecialty(e.target.value);
+    document.getElementById('globalDate').onchange = (e) => applyDate(e.target.value);
+    document.getElementById('globalHour').onchange = (e) => applyTime(e.target.value);
+    
+    document.addEventListener('keydown', (e) => { 
+        if(e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay:not(#saveSetModal)').forEach(m => m.style.display = 'none');
+        }
+    });
+    
+    document.querySelectorAll('.lang-btn').forEach(btn => { 
+        btn.addEventListener('click', () => { 
+            updateLanguage(btn.dataset.lang); 
+        }); 
+    });
+    updateLanguage('pt');
+}
     
     function updateLanguage(lang) { currentLang=lang; const t=translations[lang]; document.getElementById('appTitle').innerHTML=t.appTitle; document.getElementById('appSubtitle').innerHTML=t.appSubtitle; document.getElementById('settingsTitle').innerHTML=t.settingsTitle; document.getElementById('savedSetsText').innerHTML=t.savedSetsText; document.getElementById('layoutLabel').innerHTML=t.layoutLabel; document.getElementById('patientLabel').innerHTML=t.patientLabel; document.getElementById('hospitalLabel').innerHTML=t.hospitalLabel; document.getElementById('specialityLabel').innerHTML=t.specialityLabel; document.getElementById('dateLabel').innerHTML=t.dateLabel; document.getElementById('timeLabel').innerHTML=t.timeLabel; document.getElementById('logoLabel').innerHTML=t.logoLabel; document.getElementById('previewTitle').innerHTML=t.previewTitle; document.getElementById('editCardTitle').innerHTML=t.editCardTitle+' <span id="modalCardNum">1</span>'; document.getElementById('modalPatientLabel').innerHTML=t.modalPatientLabel; document.getElementById('modalHospitalLabel').innerHTML=t.modalHospitalLabel; document.getElementById('modalSpecialityLabel').innerHTML=t.modalSpecialityLabel; document.getElementById('modalDateLabel').innerHTML=t.modalDateLabel; document.getElementById('modalTimeLabel').innerHTML=t.modalTimeLabel; document.getElementById('modalHint').innerHTML=t.modalHint; document.getElementById('saveSetModalTitle').innerHTML=t.saveSetModalTitle; document.getElementById('setNameLabel').innerHTML=t.setNameLabel; document.getElementById('saveItemModalTitle').innerHTML=t.saveItemModalTitle; document.getElementById('saveItemAliasLabel').innerHTML=t.saveItemAliasLabel; document.getElementById('saveItemValueLabel').innerHTML=t.saveItemValueLabel; document.getElementById('editSavedItemTitle').innerHTML=t.editSavedItemTitle; document.getElementById('editSavedItemAliasLabel').innerHTML=t.editSavedItemAliasLabel; document.getElementById('editSavedItemValueLabel').innerHTML=t.editSavedItemValueLabel; document.getElementById('dangerZoneTitle').innerHTML=t.dangerZoneTitle; document.getElementById('savedSetsTitle').innerHTML=t.savedSetsTitle; document.querySelectorAll('.lang-btn').forEach(btn=>{ if(btn.dataset.lang===lang) btn.classList.add('active'); else btn.classList.remove('active'); }); renderCards(); }
     
