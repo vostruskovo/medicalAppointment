@@ -807,11 +807,24 @@ function applyToEmptyOnly(field, value, processFn = null) {
     } 
     return updated; 
 }
-
-function applyPatient(v) { applyToEmptyOnly('pacient', capitalize(sanitizeInput(v))); }
-function applySpecialty(v) { applyToEmptyOnly('speciality', sanitizeInput(v)); }
-function applyDate(v) { applyToEmptyOnly('date', formatDateForDisplay(sanitizeInput(v))); }
-function applyTime(v) { applyToEmptyOnly('hour', sanitizeInput(v)); }
+function applyToAll(field, value, processFn = null) { 
+    let updated = 0; 
+    for(let i = 0; i < currentLayout; i++) { 
+        if(!cardData[i]) cardData[i] = {}; 
+        // Apply to all cards regardless of existing value
+        cardData[i][field] = processFn ? processFn(value) : value; 
+        updated++; 
+    } 
+    if(updated > 0) { 
+        renderCards(); 
+        showMessage(`✅ ${field} aplicado em ${updated} card(s)`); 
+    } 
+    return updated; 
+}
+function applyPatient(v) { applyToAll('pacient', capitalize(sanitizeInput(v))); }
+function applySpecialty(v) { applyToAll('speciality', sanitizeInput(v)); }
+function applyDate(v) { applyToAll('date', formatDateForDisplay(sanitizeInput(v))); }
+function applyTime(v) { applyToAll('hour', sanitizeInput(v)); }
 
 function applyHospital(v) { 
     const safe = sanitizeInput(v);
@@ -2347,14 +2360,14 @@ async function initApp() {
             saveCurrentSet();
         }
     });
-
+/*
     saveSetModal.addEventListener('click', function(e) {
         if (e.target === this) {
             this.style.display = 'none';
             setNameInput.value = '';
         }
     });
-
+*/
     document.getElementById('saveSetBtn').onclick = function() {
         const modal = document.getElementById('saveSetModal');
         modal.style.display = 'flex';
@@ -2367,29 +2380,32 @@ async function initApp() {
     };
 
     // ============ EDIT MODAL ============
+    /*
     const editModal = document.getElementById('editModal');
     editModal.addEventListener('click', function(e) {
         if (e.target === this) {
             this.style.display = 'none';
         }
     });
-
+*/
     // ============ SAVE ITEM MODAL ============
+    /*
     const saveItemModal = document.getElementById('saveItemModal');
     saveItemModal.addEventListener('click', function(e) {
         if (e.target === this) {
             this.style.display = 'none';
         }
     });
-
+*/
     // ============ EDIT SAVED ITEM MODAL ============
+    /*
     const editSavedItemModal = document.getElementById('editSavedItemModal');
     editSavedItemModal.addEventListener('click', function(e) {
         if (e.target === this) {
             this.style.display = 'none';
         }
     });
-
+*/
     // ============ GLOBAL ESC KEY HANDLER WITH SMART BEHAVIOR ============
     document.addEventListener('keydown', handleEscKey);
 
