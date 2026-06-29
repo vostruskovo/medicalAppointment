@@ -388,7 +388,7 @@
             <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
         </div>
         <h1 id="appTitle">🏥 MedCard Pro v31</h1>
-        <p id="appSubtitle" class="subtitle">❌ X limpa card | ENTER: dropdown aberto → seleciona | fechado → salva | ESC: campo com texto limpa | vazio fecha</p>
+        <p id="appSubtitle" class="subtitle">❌ X limpa card | ENTER: SEMPRE salva | ESC: campo com texto limpa | vazio fecha</p>
     </header>
     
     <div class="database-status">
@@ -493,7 +493,7 @@
             </div>
             <div style="margin-top: 12px; padding: 8px; background: var(--primary-light); border-radius: 30px; text-align: center; font-size: 0.75rem;">
                 💡 <strong>❌ Clique no X</strong> para limpar o cartão individual | <strong>📋 Copiar</strong> e colar entre cards<br>
-                ⌨️ <strong>ENTER:</strong> dropdown aberto → seleciona item | dropdown fechado → salva (GLOBAL salva item / MODAL salva cartão)<br>
+                ⌨️ <strong>ENTER:</strong> SEMPRE salva (GLOBAL salva item / MODAL salva cartão)<br>
                 ⌨️ <strong>ESC:</strong> campo com texto → limpa o campo | campo vazio → fecha modal
             </div>
         </div>
@@ -544,7 +544,7 @@
             <button id="modalSaveBtn" class="button secondary">💾 Salvar</button>
             <button id="modalCancelBtn" class="button danger">Cancelar</button>
         </div>
-        <div class="esc-hint" id="modalHint">💡 ENTER: dropdown aberto seleciona | fechado salva | ESC: campo com texto limpa | vazio fecha</div>
+        <div class="esc-hint" id="modalHint">💡 ENTER: SEMPRE salva | ESC: campo com texto limpa | vazio fecha</div>
     </div>
 </div>
 
@@ -590,9 +590,9 @@ function sanitizeInput(str) {
 
 // ==================== TRANSLATIONS ====================
 const translations = {
-    pt: { appTitle: "🏥 MedCard Pro v31", appSubtitle: "❌ X limpa card | ENTER: dropdown aberto seleciona | fechado salva | ESC: campo com texto limpa | vazio fecha", settingsTitle: "⚙️ Configurações", savedSetsText: "Conjuntos", layoutLabel: "📐 Layout A4", patientLabel: "👤 Paciente (só vazios)", hospitalLabel: "🏨 Hospital (só vazios)", specialityLabel: "🔬 Especialidade (só vazios)", dateLabel: "📅 Data (só vazios)", timeLabel: "⏰ Horário (só vazios)", logoLabel: "🖼️ Logo Padrão", previewTitle: "📄 Pré-visualização", editCardTitle: "✏️ Editar Cartão", modalPatientLabel: "👤 Paciente", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Especialidade", modalDateLabel: "📅 Data", modalTimeLabel: "⏰ Horário", modalHint: "💡 ENTER: dropdown aberto seleciona | fechado salva | ESC: campo com texto limpa | vazio fecha", saveSetModalTitle: "💾 Salvar Conjunto", setNameLabel: "Nome do Conjunto", saveItemModalTitle: "💾 Salvar Item", saveItemAliasLabel: "📝 Apelido (Alias)", saveItemValueLabel: "📋 Valor Completo", editSavedItemTitle: "✏️ Editar Item", editSavedItemAliasLabel: "📝 Apelido (Alias)", editSavedItemValueLabel: "📋 Valor Completo", dangerZoneTitle: "⚠️ Área de Perigo", savedSetsTitle: "📦 Conjuntos Salvos", cardHospital: "", cardTitle: "AGENDAMENTO MÉDICO", cardPatient: "Paciente:", cardSpecialty: "Especialidade:", cardDate: "Data:", cardTime: "Horário:", cardLocation: "Local:", cardFooter1: "✓ Chegar 15 min antes", cardFooter2: "📞 Agendamento confirmado" },
-    en: { appTitle: "🏥 MedCard Pro v31", appSubtitle: "❌ X clears card | ENTER: dropdown open selects | closed saves | ESC: field with text clears | empty closes", settingsTitle: "⚙️ Settings", savedSetsText: "Sets", layoutLabel: "📐 A4 Layout", patientLabel: "👤 Patient (empty only)", hospitalLabel: "🏨 Hospital (empty only)", specialityLabel: "🔬 Specialty (empty only)", dateLabel: "📅 Date (empty only)", timeLabel: "⏰ Time (empty only)", logoLabel: "🖼️ Default Logo", previewTitle: "📄 Preview", editCardTitle: "✏️ Edit Card", modalPatientLabel: "👤 Patient", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Specialty", modalDateLabel: "📅 Date", modalTimeLabel: "⏰ Time", modalHint: "💡 ENTER: dropdown open selects | closed saves | ESC: field with text clears | empty closes", saveSetModalTitle: "💾 Save Set", setNameLabel: "Set Name", saveItemModalTitle: "💾 Save Item", saveItemAliasLabel: "📝 Alias", saveItemValueLabel: "📋 Full Value", editSavedItemTitle: "✏️ Edit Item", editSavedItemAliasLabel: "📝 Alias", editSavedItemValueLabel: "📋 Full Value", dangerZoneTitle: "⚠️ Danger Zone", savedSetsTitle: "📦 Saved Sets", cardHospital: "", cardTitle: "MEDICAL APPOINTMENT", cardPatient: "Patient:", cardSpecialty: "Specialty:", cardDate: "Date:", cardTime: "Time:", cardLocation: "Location:", cardFooter1: "✓ Arrive 15 min early", cardFooter2: "📞 Appointment confirmed" },
-    es: { appTitle: "🏥 MedCard Pro v31", appSubtitle: "❌ X limpia tarjeta | ENTER: desplegable abierto selecciona | cerrado guarda | ESC: campo con texto limpia | vacío cierra", settingsTitle: "⚙️ Configuración", savedSetsText: "Conjuntos", layoutLabel: "📐 Diseño A4", patientLabel: "👤 Paciente (solo vacíos)", hospitalLabel: "🏨 Hospital (solo vacíos)", specialityLabel: "🔬 Especialidad (solo vacíos)", dateLabel: "📅 Fecha (solo vacíos)", timeLabel: "⏰ Hora (solo vacíos)", logoLabel: "🖼️ Logo Predeterminado", previewTitle: "📄 Vista Previa", editCardTitle: "✏️ Editar Tarjeta", modalPatientLabel: "👤 Paciente", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Especialidad", modalDateLabel: "📅 Fecha", modalTimeLabel: "⏰ Hora", modalHint: "💡 ENTER: desplegable abierto selecciona | cerrado guarda | ESC: campo con texto limpia | vacío cierra", saveSetModalTitle: "💾 Guardar Conjunto", setNameLabel: "Nombre del Conjunto", saveItemModalTitle: "💾 Guardar Item", saveItemAliasLabel: "📝 Alias", saveItemValueLabel: "📋 Valor Completo", editSavedItemTitle: "✏️ Editar Item", editSavedItemAliasLabel: "📝 Alias", editSavedItemValueLabel: "📋 Valor Completo", dangerZoneTitle: "⚠️ Zona de Peligro", savedSetsTitle: "📦 Conjuntos Guardados", cardHospital: "", cardTitle: "CITA MÉDICA", cardPatient: "Paciente:", cardSpecialty: "Especialidad:", cardDate: "Fecha:", cardTime: "Hora:", cardLocation: "Ubicación:", cardFooter1: "✓ Llegar 15 min antes", cardFooter2: "📞 Cita confirmada" }
+    pt: { appTitle: "🏥 MedCard Pro v31", appSubtitle: "❌ X limpa card | ENTER: SEMPRE salva | ESC: campo com texto limpa | vazio fecha", settingsTitle: "⚙️ Configurações", savedSetsText: "Conjuntos", layoutLabel: "📐 Layout A4", patientLabel: "👤 Paciente (só vazios)", hospitalLabel: "🏨 Hospital (só vazios)", specialityLabel: "🔬 Especialidade (só vazios)", dateLabel: "📅 Data (só vazios)", timeLabel: "⏰ Horário (só vazios)", logoLabel: "🖼️ Logo Padrão", previewTitle: "📄 Pré-visualização", editCardTitle: "✏️ Editar Cartão", modalPatientLabel: "👤 Paciente", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Especialidade", modalDateLabel: "📅 Data", modalTimeLabel: "⏰ Horário", modalHint: "💡 ENTER: SEMPRE salva | ESC: campo com texto limpa | vazio fecha", saveSetModalTitle: "💾 Salvar Conjunto", setNameLabel: "Nome do Conjunto", saveItemModalTitle: "💾 Salvar Item", saveItemAliasLabel: "📝 Apelido (Alias)", saveItemValueLabel: "📋 Valor Completo", editSavedItemTitle: "✏️ Editar Item", editSavedItemAliasLabel: "📝 Apelido (Alias)", editSavedItemValueLabel: "📋 Valor Completo", dangerZoneTitle: "⚠️ Área de Perigo", savedSetsTitle: "📦 Conjuntos Salvos", cardHospital: "HOSPITAL", cardTitle: "AGENDAMENTO MÉDICO", cardPatient: "Paciente:", cardSpecialty: "Especialidade:", cardDate: "Data:", cardTime: "Horário:", cardLocation: "Local:", cardFooter1: "✓ Chegar 15 min antes", cardFooter2: "📞 Agendamento confirmado" },
+    en: { appTitle: "🏥 MedCard Pro v31", appSubtitle: "❌ X clears card | ENTER: ALWAYS saves | ESC: field with text clears | empty closes", settingsTitle: "⚙️ Settings", savedSetsText: "Sets", layoutLabel: "📐 A4 Layout", patientLabel: "👤 Patient (empty only)", hospitalLabel: "🏨 Hospital (empty only)", specialityLabel: "🔬 Specialty (empty only)", dateLabel: "📅 Date (empty only)", timeLabel: "⏰ Time (empty only)", logoLabel: "🖼️ Default Logo", previewTitle: "📄 Preview", editCardTitle: "✏️ Edit Card", modalPatientLabel: "👤 Patient", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Specialty", modalDateLabel: "📅 Date", modalTimeLabel: "⏰ Time", modalHint: "💡 ENTER: ALWAYS saves | ESC: field with text clears | empty closes", saveSetModalTitle: "💾 Save Set", setNameLabel: "Set Name", saveItemModalTitle: "💾 Save Item", saveItemAliasLabel: "📝 Alias", saveItemValueLabel: "📋 Full Value", editSavedItemTitle: "✏️ Edit Item", editSavedItemAliasLabel: "📝 Alias", editSavedItemValueLabel: "📋 Full Value", dangerZoneTitle: "⚠️ Danger Zone", savedSetsTitle: "📦 Saved Sets", cardHospital: "HOSPITAL", cardTitle: "MEDICAL APPOINTMENT", cardPatient: "Patient:", cardSpecialty: "Specialty:", cardDate: "Date:", cardTime: "Time:", cardLocation: "Location:", cardFooter1: "✓ Arrive 15 min early", cardFooter2: "📞 Appointment confirmed" },
+    es: { appTitle: "🏥 MedCard Pro v31", appSubtitle: "❌ X limpia tarjeta | ENTER: SIEMPRE guarda | ESC: campo con texto limpia | vacío cierra", settingsTitle: "⚙️ Configuración", savedSetsText: "Conjuntos", layoutLabel: "📐 Diseño A4", patientLabel: "👤 Paciente (solo vacíos)", hospitalLabel: "🏨 Hospital (solo vacíos)", specialityLabel: "🔬 Especialidad (solo vacíos)", dateLabel: "📅 Fecha (solo vacíos)", timeLabel: "⏰ Hora (solo vacíos)", logoLabel: "🖼️ Logo Predeterminado", previewTitle: "📄 Vista Previa", editCardTitle: "✏️ Editar Tarjeta", modalPatientLabel: "👤 Paciente", modalHospitalLabel: "🏨 Hospital", modalSpecialityLabel: "🔬 Especialidad", modalDateLabel: "📅 Fecha", modalTimeLabel: "⏰ Hora", modalHint: "💡 ENTER: SIEMPRE guarda | ESC: campo con texto limpia | vacío cierra", saveSetModalTitle: "💾 Guardar Conjunto", setNameLabel: "Nombre del Conjunto", saveItemModalTitle: "💾 Guardar Item", saveItemAliasLabel: "📝 Alias", saveItemValueLabel: "📋 Valor Completo", editSavedItemTitle: "✏️ Editar Item", editSavedItemAliasLabel: "📝 Alias", editSavedItemValueLabel: "📋 Valor Completo", dangerZoneTitle: "⚠️ Zona de Peligro", savedSetsTitle: "📦 Conjuntos Guardados", cardHospital: "HOSPITAL", cardTitle: "CITA MÉDICA", cardPatient: "Paciente:", cardSpecialty: "Especialidad:", cardDate: "Fecha:", cardTime: "Hora:", cardLocation: "Ubicación:", cardFooter1: "✓ Llegar 15 min antes", cardFooter2: "📞 Cita confirmada" }
 };
 
 // ==================== GLOBAL STATE ====================
@@ -727,7 +727,6 @@ function clearCard(index) {
     if(index >= 0 && index < currentLayout) {
         cardData[index] = {};
         individualLogos[index] = null;
-        // Update logo storage
         const logoData = loadLogosFromStorage();
         logoData.individualLogos = individualLogos;
         saveLogosToStorage(logoData);
@@ -774,7 +773,7 @@ function applyHospital(v) {
     } 
 }
 
-// ==================== DROPDOWN SYSTEM WITH ENTER SELECT ====================
+// ==================== DROPDOWN SYSTEM - ENTER ALWAYS SAVES ====================
 function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, itemType, isModal = false, modalSaveCallback = null) {
     const input = document.getElementById(inputId);
     const container = document.getElementById(containerId);
@@ -804,7 +803,7 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }
         dropdown.style.display = 'block';
         isDropdownOpen = true;
-        dropdown.innerHTML = `<div class="dropdown-header">📋 ${currentItems.length} resultado(s) | ↑↓ | ENTER seleciona</div>`;
+        dropdown.innerHTML = `<div class="dropdown-header">📋 ${currentItems.length} resultado(s) | ↑↓ | Clique para selecionar</div>`;
         currentItems.forEach((item, idx) => {
             const displayValue = getValueFunc(item);
             const safeAlias = escapeHtml(item.alias);
@@ -859,57 +858,54 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
             items[currentSelectedIndex].scrollIntoView({ block: 'nearest' }); 
     }
     
-    function selectCurrent() { 
-        const selected = dropdown.querySelector('.dropdown-item.selected'); 
-        if(selected) { 
-            isSelectingFromDropdown = true;
-            selectItem(selected.dataset.value, itemType); 
-            currentSelectedIndex = -1; 
-            setTimeout(() => { isSelectingFromDropdown = false; }, 200);
-            return true; 
-        } 
-        return false; 
-    }
-    
     input.addEventListener('click', (e) => { e.stopPropagation(); openDropdown(); });
     input.addEventListener('input', () => { renderDropdown(input.value); currentSelectedIndex = -1; });
     input.addEventListener('keydown', (e) => {
         const isOpen = dropdown.style.display === 'block';
+        
         if(isOpen) {
             const items = dropdown.querySelectorAll('.dropdown-item');
             if(items.length > 0) {
-                if(e.key === 'ArrowDown') { e.preventDefault(); currentSelectedIndex = (currentSelectedIndex + 1) % items.length; updateSelection(); }
-                else if(e.key === 'ArrowUp') { e.preventDefault(); currentSelectedIndex = (currentSelectedIndex - 1 + items.length) % items.length; updateSelection(); }
-                else if(e.key === 'Enter') { 
-                    e.preventDefault(); 
-                    selectCurrent();
+                if(e.key === 'ArrowDown') { e.preventDefault(); currentSelectedIndex = (currentSelectedIndex + 1) % items.length; updateSelection(); return; }
+                else if(e.key === 'ArrowUp') { e.preventDefault(); currentSelectedIndex = (currentSelectedIndex - 1 + items.length) % items.length; updateSelection(); return; }
+                else if(e.key === 'Enter') {
+                    e.preventDefault();
+                    // ENTER ALWAYS SAVES - close dropdown and save
+                    dropdown.style.display = 'none';
                     isDropdownOpen = false;
+                    const val = input.value.trim();
+                    if(val) {
+                        if(isModal && modalSaveCallback) {
+                            modalSaveCallback();
+                        } else {
+                            const customEv = new CustomEvent('custom-save', { detail: { value: sanitizeInput(val) } });
+                            input.dispatchEvent(customEv);
+                        }
+                    }
                     return;
                 }
                 else if(e.key === 'Escape') { 
                     dropdown.style.display = 'none'; 
                     isDropdownOpen = false;
                     currentSelectedIndex = -1; 
+                    return;
                 }
                 return;
             }
         }
+        
+        // Dropdown is closed - ENTER saves
         if(e.key === 'Enter' && !isOpen) {
             e.preventDefault();
             if(isSelectingFromDropdown) {
                 isSelectingFromDropdown = false;
                 return;
             }
-            // If modal save callback exists, use it (for modal fields)
-            if(isModal && modalSaveCallback) {
-                const val = input.value.trim();
-                if(val) {
+            const val = input.value.trim();
+            if(val) {
+                if(isModal && modalSaveCallback) {
                     modalSaveCallback();
-                }
-            } else {
-                // Global fields - trigger custom save event
-                const val = input.value.trim();
-                if(val) {
+                } else {
                     const customEv = new CustomEvent('custom-save', { detail: { value: sanitizeInput(val) } });
                     input.dispatchEvent(customEv);
                 }
@@ -918,7 +914,6 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         if(e.key === 'ArrowDown' && !isOpen) { e.preventDefault(); openDropdown(); }
     });
     
-    // Close dropdown on blur
     input.addEventListener('blur', function() {
         setTimeout(() => {
             dropdown.style.display = 'none';
@@ -1035,14 +1030,18 @@ function renderCards() {
         const logo = (i < individualLogos.length && individualLogos[i]) || globalLogo;
         const hospFull = d.hospitalFullValue || d.hospital || '';
         
-        const hasHospitalName = getHospitalDisplayName(hospFull) && getHospitalDisplayName(hospFull).trim();
+        // Show "HOSPITAL" as default when no hospital name is set
+        const displayHospitalName = (getHospitalDisplayName(hospFull) && getHospitalDisplayName(hospFull).trim()) 
+            ? escapeHtml(capitalize(getHospitalDisplayName(hospFull))) 
+            : escapeHtml(t.cardHospital);
         
         const safePatient = escapeHtml(capitalize(d.pacient || '') || '_________________');
         const safeSpeciality = escapeHtml(d.speciality || '_________________');
         const safeDate = escapeHtml(d.date || '__/__/____');
         const safeHour = escapeHtml(d.hour || '__:__');
-        const safeHospitalName = hasHospitalName ? escapeHtml(capitalize(getHospitalDisplayName(hospFull))) : '';
-        const safeHospitalFull = hasHospitalName ? escapeHtml(getHospitalFullAddress(hospFull)) : '_________________';
+        const safeHospitalFull = (getHospitalFullAddress(hospFull) && getHospitalFullAddress(hospFull).trim()) 
+            ? escapeHtml(getHospitalFullAddress(hospFull)) 
+            : '_________________';
         const safeCardTitle = escapeHtml(t.cardTitle);
         const safeCardPatient = escapeHtml(t.cardPatient);
         const safeCardSpecialty = escapeHtml(t.cardSpecialty);
@@ -1057,7 +1056,7 @@ function renderCards() {
             <div class="clear-card-btn" data-clear-index="${i}" title="Limpar este cartão">✕</div>
             <div style="display:flex;align-items:center;gap:10px;">
                 <div class="card-logo-container" data-logo-index="${i}">${logo ? `<img class="card-logo" src="${escapeHtml(logo)}">` : '<span style="font-size:42px;">🏥</span>'}</div>
-                <div class="hospital-name">${safeHospitalName}</div>
+                <div class="hospital-name">${displayHospitalName}</div>
             </div>
             <div class="card-title">${safeCardTitle}</div>
             <div class="appointment-details">
@@ -2041,7 +2040,7 @@ function showPasswordPrompt() {
         <p><strong>❌ Clique no X para limpar cada card</strong></p>
         <p style="font-size:0.8rem; color:#666;">🖼️ Logos NÃO são criptografados (armazenados separadamente)</p>
         <p style="font-size:0.7rem; color:#888;">💡 Sistema inicia completamente limpo - sem dados nem imagens</p>
-        <p style="font-size:0.7rem; color:#888;">⌨️ ENTER: dropdown aberto seleciona | fechado salva</p>
+        <p style="font-size:0.7rem; color:#888;">⌨️ ENTER: SEMPRE salva (dropdown aberto ou fechado)</p>
         <p style="font-size:0.7rem; color:#888;">⌨️ ESC: campo com texto limpa | campo vazio fecha modal</p>
         <input type="password" id="pwdInput" placeholder="Digite sua senha">
         <button id="unlockBtn" class="button secondary">🔓 Desbloquear</button>
