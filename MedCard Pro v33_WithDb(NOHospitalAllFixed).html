@@ -825,22 +825,11 @@ function applyPatient(v) { applyToAll('pacient', capitalize(sanitizeInput(v))); 
 function applySpecialty(v) { applyToAll('speciality', sanitizeInput(v)); }
 function applyDate(v) { applyToAll('date', formatDateForDisplay(sanitizeInput(v))); }
 function applyTime(v) { applyToAll('hour', sanitizeInput(v)); }
-
 function applyHospital(v) { 
     const safe = sanitizeInput(v);
-    let up=0; 
-    for(let i=0;i<currentLayout;i++) { 
-        if(!cardData[i]) cardData[i]={}; 
-        if(isEmptyField(cardData[i].hospitalFullValue)) { 
-            cardData[i].hospitalFullValue = safe; 
-            cardData[i].hospital = getHospitalDisplayName(safe); 
-            up++; 
-        } 
-    } 
-    if(up>0) { 
-        renderCards(); 
-        showMessage(`✅ Hospital aplicado em ${up} vazio(s)`); 
-    } 
+    const displayName = getHospitalDisplayName(safe);
+    applyToAll('hospitalFullValue', safe);
+    applyToAll('hospital', displayName);
 }
 
 // ==================== DROPDOWN SYSTEM ====================
@@ -1225,18 +1214,15 @@ function applyHospitalWithAlias(fullValue, alias) {
     let up = 0; 
     for(let i = 0; i < currentLayout; i++) { 
         if(!cardData[i]) cardData[i] = {}; 
-        if(isEmptyField(cardData[i].hospitalFullValue)) { 
-            cardData[i].hospitalFullValue = safe; 
-            cardData[i].hospital = safeAlias; 
-            up++; 
-        } 
+        // Remove the isEmptyField check - apply to ALL cards
+        cardData[i].hospitalFullValue = safe; 
+        cardData[i].hospital = safeAlias; 
+        up++; 
     } 
     if(up > 0) { 
         renderCards(); 
-        showMessage(`✅ Hospital aplicado em ${up} vazio(s)`); 
-    } else {
-        showMessage('⚠️ Nenhum campo vazio para preencher', 'warning');
-    }
+        showMessage(`✅ Hospital aplicado em ${up} card(s)`); 
+    } 
 }
 function renderCards() {
     resizeArrays();
@@ -1444,24 +1430,21 @@ function saveAndApplyUser() {
         } 
     } 
 }
-
-function saveAndApplyHospital() { 
-    let v = document.getElementById('globalHospital').value.trim(); 
-    if(v) { 
-        const safeV = sanitizeInput(v); 
-        const existing=db.savedHospitals.find(h=>h.hospitalName===safeV); 
-        if(existing) { 
-            applyHospital(safeV); 
-            document.getElementById('globalHospital').value=''; 
-        } else { 
-            document.getElementById('saveItemAlias').value=safeV.split(',')[0].substring(0,25); 
-            document.getElementById('saveItemValue').value=safeV; 
-            document.getElementById('saveItemModal').style.display='flex'; 
-            window.pendingSaveType='hospital'; 
-        } 
+function applyHospital(v) { 
+    const safe = sanitizeInput(v);
+    const displayName = getHospitalDisplayName(safe);
+    let up = 0; 
+    for(let i = 0; i < currentLayout; i++) { 
+        if(!cardData[i]) cardData[i] = {}; 
+        cardData[i].hospitalFullValue = safe; 
+        cardData[i].hospital = displayName; 
+        up++; 
+    } 
+    if(up > 0) { 
+        renderCards(); 
+        showMessage(`✅ Hospital aplicado em ${up} card(s)`); 
     } 
 }
-
 async function confirmSaveItem() { 
     const alias=sanitizeInput(document.getElementById('saveItemAlias').value.trim()); 
     const full=sanitizeInput(document.getElementById('saveItemValue').value.trim()); 

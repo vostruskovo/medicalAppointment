@@ -829,21 +829,19 @@ function applyTime(v) { applyToAll('hour', sanitizeInput(v)); }
 
 function applyHospital(v) { 
     const safe = sanitizeInput(v);
-    let up=0; 
-    for(let i=0;i<currentLayout;i++) { 
-        if(!cardData[i]) cardData[i]={}; 
-        if(isEmptyField(cardData[i].hospitalFullValue)) { 
-            cardData[i].hospitalFullValue = safe; 
-            cardData[i].hospital = getHospitalDisplayName(safe); 
-            up++; 
-        } 
+    const displayName = getHospitalDisplayName(safe);
+    let up = 0; 
+    for(let i = 0; i < currentLayout; i++) { 
+        if(!cardData[i]) cardData[i] = {}; 
+        cardData[i].hospitalFullValue = safe; 
+        cardData[i].hospital = displayName; 
+        up++; 
     } 
-    if(up>0) { 
+    if(up > 0) { 
         renderCards(); 
-        showMessage(`✅ Hospital aplicado em ${up} vazio(s)`); 
+        showMessage(`✅ Hospital aplicado em ${up} card(s)`); 
     } 
 }
-
 // ==================== DROPDOWN SYSTEM ====================
 function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, itemType, isModal = false, modalSaveCallback = null) {
     const input = document.getElementById(inputId);
