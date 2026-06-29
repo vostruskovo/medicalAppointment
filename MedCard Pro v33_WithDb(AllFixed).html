@@ -279,12 +279,18 @@
             flex-shrink: 0;
             border: 2px solid rgba(0,0,0,0.2);
         }
+        /* logo card */
         .layout-1-cards .card-logo-container { width: 500px; height: 130px; }
         .layout-2-cards .card-logo-container { width: 250px; height: 100px; }
         .layout-4-cards .card-logo-container { width: 125px; height: 75px; }
         .layout-6-cards .card-logo-container { width: 125px; height: 55px; }
         .layout-8-cards .card-logo-container { width: 125px; height: 45px; }
-        
+ 
+        .card-logo-container {
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
         .card-logo { max-width: 90%; max-height: 90%; object-fit: contain; }
         .hospital-name { font-weight: 800; color: var(--primary); flex: 1; }
         .layout-1-cards .hospital-name { font-size: 3rem; margin-left: 60px; }
@@ -377,6 +383,47 @@
         .password-box { background: white; border-radius: 32px; padding: 32px; width: 90%; max-width: 400px; text-align: center; border: 3px solid black; }
         .security-badge { background: #2a9d8f20; padding: 8px 12px; border-radius: 30px; font-size: 0.7rem; margin-top: 12px; }
         .database-status { background: var(--gray-100); padding: 8px 16px; border-radius: 40px; display: inline-flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+
+        .card-logo-container {
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(0,0,0,0.2);
+    position: relative;
+}
+.card-logo-container .logo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.card-logo-container:hover .logo-overlay {
+    opacity: 1;
+}
+.card-logo { 
+    max-width: 90%; 
+    max-height: 90%; 
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+}
     </style>
 </head>
 <body>
@@ -703,7 +750,8 @@ function compressLogo(dataUrl) {
         const img = new Image();
         img.onload = function() {
             const canvas = document.createElement('canvas');
-            const maxSize = 100;
+            // Larger size for better quality in the container
+            const maxSize = 300;
             let width = img.width;
             let height = img.height;
             if (width > height) {
@@ -721,7 +769,7 @@ function compressLogo(dataUrl) {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', 0.5));
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
         };
         img.onerror = function() {
             resolve(dataUrl);
@@ -797,8 +845,9 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
     
     let currentSelectedIndex = -1;
     let isSelectingFromDropdown = false;
-    let isDropdownOpen = false;
+    let isDropdownOpen = false; // Track dropdown open state
     
+    // Store reference to current items for selection
     let currentItems = [];
     
     function renderDropdown(filter = '') {
@@ -857,12 +906,14 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         dropdown.style.display = 'none'; 
         isDropdownOpen = false;
         currentSelectedIndex = -1;
+        // Dispatch input event to trigger any listeners
         input.dispatchEvent(new Event('input', { bubbles: true }));
     }
     
     function openDropdown() { 
         if(storageArray.length > 0) {
             renderDropdown(input.value);
+            // Re-highlight if there was a previous selection
             if(currentSelectedIndex >= 0 && currentSelectedIndex < currentItems.length) {
                 updateSelection();
             }
@@ -888,29 +939,37 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         return false; 
     }
     
+    // Click on input - open dropdown
     input.addEventListener('click', (e) => { 
         e.stopPropagation(); 
+        // If dropdown is already open, keep it open; otherwise open it
         if (!isDropdownOpen) {
             openDropdown(); 
         } else {
+            // If it's open but hidden, show it again
             if (dropdown.style.display === 'none') {
                 openDropdown();
             }
         }
     });
     
+    // Input event - filter dropdown
     input.addEventListener('input', () => { 
         if (input.value.length > 0 || isDropdownOpen) {
             renderDropdown(input.value); 
             currentSelectedIndex = -1; 
         } else {
+            // If input is empty, show all items
             renderDropdown('');
             currentSelectedIndex = -1;
         }
     });
     
+    // Focus event - open dropdown when focusing the field
     input.addEventListener('focus', () => {
+        // If we're selecting from dropdown, don't reopen
         if (isSelectingFromDropdown) return;
+        // Small delay to allow click events to process
         setTimeout(() => {
             if (!isDropdownOpen && storageArray.length > 0) {
                 openDropdown();
@@ -918,12 +977,17 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }, 50);
     });
     
+    // Blur event - close dropdown when losing focus, but with delay to allow clicks
     input.addEventListener('blur', () => {
+        // Don't close immediately - allow clicks on dropdown items
         setTimeout(() => {
+            // Check if the new focus is inside the dropdown container
             const activeElement = document.activeElement;
             if (container.contains(activeElement) || (activeElement && activeElement.closest && activeElement.closest('.smart-dropdown'))) {
+                // Still inside dropdown, keep it open
                 return;
             }
+            // Check if we clicked on a dropdown item action button
             if (activeElement && (activeElement.classList.contains('item-edit') || activeElement.classList.contains('item-delete'))) {
                 return;
             }
@@ -933,6 +997,7 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }, 150);
     });
     
+    // Keyboard navigation
     input.addEventListener('keydown', (e) => {
         const isOpen = isDropdownOpen && dropdown.style.display === 'block';
         const items = dropdown.querySelectorAll('.dropdown-item');
@@ -953,8 +1018,10 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
                 if (currentSelectedIndex >= 0) {
                     selectCurrent();
                 } else {
+                    // If nothing selected, close dropdown and let Enter save
                     dropdown.style.display = 'none';
                     isDropdownOpen = false;
+                    // Let the Enter key propagate for saving
                     return;
                 }
                 return;
@@ -965,12 +1032,14 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
                 currentSelectedIndex = -1; 
                 e.preventDefault();
             }
+            // If we handled a navigation key, prevent default behavior
             if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) {
                 e.stopPropagation();
             }
             return;
         }
         
+        // If dropdown is not open and user presses Enter
         if(e.key === 'Enter' && !isOpen) {
             e.preventDefault();
             if(isSelectingFromDropdown) {
@@ -989,12 +1058,14 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
             return;
         }
         
+        // ArrowDown to open dropdown if closed
         if(e.key === 'ArrowDown' && !isOpen) { 
             e.preventDefault(); 
             openDropdown(); 
         }
     });
     
+    // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
         if (!container.contains(e.target)) {
             dropdown.style.display = 'none';
@@ -1003,6 +1074,7 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }
     });
     
+    // Store reference to input for modal save
     input._dropdownData = { dropdown, isDropdownOpen: () => isDropdownOpen, currentSelectedIndex: () => currentSelectedIndex, selectCurrent };
 }
 
@@ -1131,11 +1203,18 @@ function renderCards() {
         const safeFooter1 = escapeHtml(t.cardFooter1);
         const safeFooter2 = escapeHtml(t.cardFooter2);
         
+        // Check if logo exists for background
+        const hasLogo = logo ? true : false;
+        const bgStyle = hasLogo ? `style="background-image: url('${escapeHtml(logo)}'); background-size: cover; background-position: center; background-repeat: no-repeat;"` : '';
+        
         grid.innerHTML += `<div class="appointment-card" data-card-index="${i}">
             <div class="copy-badge" data-copy-index="${i}">📋</div>
             <div class="clear-card-btn" data-clear-index="${i}" title="Limpar este cartão">✕</div>
             <div style="display:flex;align-items:center;gap:10px;">
-                <div class="card-logo-container" data-logo-index="${i}">${logo ? `<img class="card-logo" src="${escapeHtml(logo)}">` : '<span style="font-size:42px;">🏥</span>'}</div>
+                <div class="card-logo-container" data-logo-index="${i}" ${bgStyle}>
+                    ${hasLogo ? '' : '<span style="font-size:42px;">🏥</span>'}
+                    <div class="logo-overlay">🔄 Trocar</div>
+                </div>
                 <div class="hospital-name">${safeHospitalName}</div>
             </div>
             <div class="card-title">${safeCardTitle}</div>
@@ -1151,7 +1230,6 @@ function renderCards() {
     }
     attachCardEvents();
 }
-
 function attachCardEvents() {
     document.querySelectorAll('.copy-badge').forEach(b => { 
         b.onclick = (e) => { 
@@ -1193,35 +1271,35 @@ function attachCardEvents() {
     });
     
     document.querySelectorAll('.card-logo-container').forEach(cont => { 
-        cont.onclick = (e) => { 
-            e.stopPropagation(); 
-            const idx = parseInt(cont.dataset.logoIndex); 
-            const inp = document.createElement('input'); 
-            inp.type = 'file'; 
-            inp.accept = 'image/*'; 
-            inp.onchange = async (ev) => { 
-                const f = ev.target.files[0]; 
-                if(f) { 
-                    const r = new FileReader(); 
-                    r.onload = async (ev2) => { 
-                        try {
-                            const compressed = await compressLogo(ev2.target.result);
-                            individualLogos[idx] = compressed;
-                            const logoData = loadLogosFromStorage();
-                            logoData.individualLogos = individualLogos;
-                            saveLogosToStorage(logoData);
-                            renderCards(); 
-                            showMessage('Logo adicionado!'); 
-                        } catch(err) {
-                            showMessage('Erro ao processar imagem', 'error');
-                        }
-                    }; 
-                    r.readAsDataURL(f); 
-                } 
-            }; 
-            inp.click(); 
+    cont.onclick = (e) => { 
+        e.stopPropagation(); 
+        const idx = parseInt(cont.dataset.logoIndex); 
+        const inp = document.createElement('input'); 
+        inp.type = 'file'; 
+        inp.accept = 'image/*'; 
+        inp.onchange = async (ev) => { 
+            const f = ev.target.files[0]; 
+            if(f) { 
+                const r = new FileReader(); 
+                r.onload = async (ev2) => { 
+                    try {
+                        const compressed = await compressLogo(ev2.target.result);
+                        individualLogos[idx] = compressed;
+                        const logoData = loadLogosFromStorage();
+                        logoData.individualLogos = individualLogos;
+                        saveLogosToStorage(logoData);
+                        renderCards(); 
+                        showMessage('Logo adicionado!'); 
+                    } catch(err) {
+                        showMessage('Erro ao processar imagem', 'error');
+                    }
+                }; 
+                r.readAsDataURL(f); 
+            } 
         }; 
-    });
+        inp.click(); 
+    }; 
+});
 }
 
 // ==================== MODAL FUNCTIONS ====================
