@@ -481,6 +481,13 @@
         
         <div class="preview-section">
             <h2 class="section-title" id="previewTitle">📄 Pré-visualização</h2>
+                    <!-- Add after the excelExportBtn -->
+<div class="actions" style="margin-top: 10px;">
+    <button id="exportCardsBtn" class="button" style="background: #0f5c6e;">📤 Exportar Cards</button>
+    <button id="importCardsBtn" class="button secondary">📥 Importar Cards</button>
+    <input type="file" id="importCardsFile" accept=".json" style="display: none;">
+</div>
+<br>
             <div style="overflow-x: auto; text-align: center;">
                 <div class="paper-sheet">
                     <div class="appointments-grid layout-2-cards" id="cardsGrid"></div>
@@ -2368,6 +2375,177 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('appTitle').textContent = t.appTitle;
     }
 });
+
+
+
+// ==================== EXPORT/IMPORT CARDS WITH CONFIG ====================
+
+function exportCardsWithConfig() {
+    try {
+        // Prepare export data
+        const exportData = {
+            version: window.APP_VERSION || 'v31',
+            timestamp: new Date().toISOString(),
+            layout: currentLayout,
+            cards: [],
+            logos: {
+                globalLogo: globalLogo,
+                individualLogos: []
+            }
+        };
+        
+        // Export card data
+        for (let i = 0; i < currentLayout; i++) {
+            const card = cardData[i] || {};
+            exportData.cards.push({
+                pacient: card.pacient || '',
+                hospital: card.hospital || '',
+                hospitalFullValue: card.hospitalFullValue || '',
+                speciality: card.speciality || '',
+                date: card.date || '',
+                hour: card.hour || ''
+            });
+        }
+        
+        // Export logos
+        exportData.logos.individualLogos = [];
+        for (let i = 0; i < currentLayout; i++) {
+            exportData.logos.individualLogos.push(individualLogos[i] || null);
+        }
+        
+        // Create and download file
+        const json = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `medcard_cards_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showMessage('✅ Cards exportados com sucesso!', 'success');
+    } catch (e) {
+        showMessage('❌ Erro ao exportar: ' + e.message, 'error');
+        console.error(e);
+    }
+}
+
+function importCardsWithConfig(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importData = JSON.parse(e.target.result);
+            
+            // Validate import data
+            if (!importData.cards || !Array.isArray(importData.cards)) {
+                showMessage('❌ Arquivo inválido!', 'error');
+                return;
+            }
+            
+            // Ask user if they want to replace or append
+            if (!confirm(`Deseja importar ${importData.cards.length} cartões?\n\nLayout: ${importData.layout || currentLayout} cartões\n\n⚠️ Isso substituirá os dados atuais!`)) {
+                return;
+            }
+            
+            // Set layout
+            if (importData.layout) {
+                currentLayout = importData.layout;
+                db.settings.lastLayout = currentLayout;
+                
+                // Update UI layout selector
+                document.querySelectorAll('.layout-option').forEach(o => {
+                    o.classList.remove('selected');
+                    if (parseInt(o.dataset.layout) === currentLayout) {
+                        o.classList.add('selected');
+                    }
+                });
+            }
+            
+            // Reset arrays to match imported data size
+            resetArrays();
+            
+            // Import card data
+            const cardCount = Math.min(importData.cards.length, 8);
+            for (let i = 0; i < cardCount; i++) {
+                const importedCard = importData.cards[i] || {};
+                cardData[i] = {
+                    pacient: importedCard.pacient || '',
+                    hospital: importedCard.hospital || '',
+                    hospitalFullValue: importedCard.hospitalFullValue || '',
+                    speciality: importedCard.speciality || '',
+                    date: importedCard.date || '',
+                    hour: importedCard.hour || ''
+                };
+            }
+            
+            // Import logos
+            if (importData.logos) {
+                globalLogo = importData.logos.globalLogo || null;
+                
+                if (importData.logos.individualLogos) {
+                    for (let i = 0; i < Math.min(importData.logos.individualLogos.length, 8); i++) {
+                        individualLogos[i] = importData.logos.individualLogos[i] || null;
+                    }
+                }
+                
+                // Save logos to storage
+                const logoData = loadLogosFromStorage();
+                logoData.globalLogo = globalLogo;
+                logoData.individualLogos = individualLogos;
+                saveLogosToStorage(logoData);
+                
+                // Update UI logo preview
+                if (globalLogo) {
+                    document.getElementById('logoPreview').src = globalLogo;
+                    document.getElementById('logoPreview').style.display = 'block';
+                    document.getElementById('logoPlaceholder').style.display = 'none';
+                    document.getElementById('removeLogoBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('logoPreview').style.display = 'none';
+                    document.getElementById('logoPlaceholder').style.display = 'block';
+                    document.getElementById('removeLogoBtn').style.display = 'none';
+                }
+            }
+            
+            // Save to database
+            saveDb();
+            
+            // Re-render
+            renderCards();
+            
+            showMessage(`✅ ${cardCount} cartões importados com sucesso!`, 'success');
+            
+        } catch (err) {
+            showMessage('❌ Erro ao importar: ' + err.message, 'error');
+            console.error(err);
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ============ EXPORT/IMPORT CARDS ============
+document.getElementById('exportCardsBtn').onclick = function() {
+    if (cardData.length === 0 || cardData.every(c => !c.pacient && !c.hospital && !c.speciality && !c.date && !c.hour)) {
+        if (!confirm('⚠️ Nenhum dado nos cards. Deseja exportar mesmo assim?')) {
+            return;
+        }
+    }
+    exportCardsWithConfig();
+};
+
+document.getElementById('importCardsBtn').onclick = function() {
+    document.getElementById('importCardsFile').click();
+};
+
+document.getElementById('importCardsFile').onchange = function(e) {
+    if (this.files && this.files[0]) {
+        importCardsWithConfig(this.files[0]);
+        this.value = ''; // Reset file input
+    }
+};
+
 
 </script>
 </body>
