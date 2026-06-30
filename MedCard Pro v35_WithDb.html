@@ -68,20 +68,48 @@
         }
         
         .lang-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
             color: white;
-            padding: 8px 12px;
-            border-radius: 40px;
+            padding: 4px 12px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.75rem;
-            min-height: 44px;
-            transition: all 0.2s;
-            border: 1px solid rgba(0,0,0,0.15);
+            font-size: 0.7rem;
+            min-height: 32px;
+            transition: all 0.3s ease;
+        }
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.6);
+        }
+        .lang-btn.active {
+            background: white;
+            color: #0f5c6e;
+            border: 2px solid white;
         }
         
-        .lang-btn.active { background: white; color: var(--primary); border: 2px solid black; }
+        .login-lang-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.7rem;
+            min-height: 32px;
+            transition: all 0.3s ease;
+        }
+        .login-lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+        .login-lang-btn.active {
+            background: white;
+            color: #0f5c6e;
+            border: 2px solid #0f5c6e;
+        }
         
         .main-content {
             display: flex;
@@ -279,7 +307,6 @@
             flex-shrink: 0;
             border: 2px solid rgba(0,0,0,0.2);
         }
-        /* logo card */
         .layout-1-cards .card-logo-container { width: 500px; height: 130px; }
         .layout-2-cards .card-logo-container { width: 250px; height: 100px; }
         .layout-4-cards .card-logo-container { width: 125px; height: 75px; }
@@ -425,48 +452,96 @@
     z-index: 1;
 }
 
-.language-switcher {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    gap: 6px;
+.password-box {
+  color: #222;        /* dark gray text */
 }
 
-.lang-btn {
-    background: transparent;
-    border: 2px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.7rem;
-    min-height: 32px;
-    transition: all 0.3s ease;
+.password-box label {
+  color: #00c896;     /* neon green accent */
 }
 
-.lang-btn:hover {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.6);
+.password-box input[type="password"] {
+  background: #fff;   /* white background */
+  color: #111;        /* dark text inside */
+  border: 1px solid #00c896;
+  padding: 10px;
+  border-radius: 6px;
 }
 
-.lang-btn.active {
-    background: white;
-    color: #0f5c6e;
-    border: 2px solid white;
+.password-box {
+  color: #222 !important; /* overrides inline white */
 }
+
+
+.password-box {
+  background: #f9fafb;       /* light neutral background */
+  color: #222;               /* default text color */
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  max-width: 360px;
+  margin: auto;
+  font-family: 'Poppins', sans-serif;
+}
+
+.password-box h2 {
+  color: #0f5c6e;            /* strong accent for title */
+}
+
+.password-box p {
+  color: #444;               /* readable body text */
+}
+
+.password-box p strong {
+  color: #0f5c6e;            /* highlight important text */
+}
+
+.password-box input[type="password"] {
+  margin-top: 16px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #111;
+  background: #fff;
+}
+
+.password-box .button {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.password-box .button.secondary {
+  background: #0f5c6e;
+  color: #fff;
+}
+
+.password-box .button:not(.secondary) {
+  background: #00c896;
+  color: #111;
+}
+
+.password-box .security-badge {
+  margin-top: 16px;
+  color: #555;
+  font-size: 0.8rem;
+}
+
     </style>
 </head>
 <body>
 <div class="container">
     <header>
         <div class="language-switcher">
-    <button class="lang-btn active" data-lang="pt">🇧🇷 PT</button>
-    <button class="lang-btn" data-lang="en">🇺🇸 EN</button>
-    <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
-</div>
-
+            <button class="lang-btn active" data-lang="pt">🇧🇷 PT</button>
+            <button class="lang-btn" data-lang="en">🇺🇸 EN</button>
+            <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        </div>
         <h1 id="appTitle">🏥 MedCard Pro v32</h1>
         <p id="appSubtitle" class="subtitle">❌ Clique no X para limpar o cartão individual | ENTER: dropdown → seleciona | fechado → salva</p>
     </header>
@@ -571,7 +646,6 @@
                 <div class="paper-sheet">
                     <div class="appointments-grid layout-2-cards" id="cardsGrid"></div>
                 </div>
-
             </div>
             <div class="actions">
                 <button id="pdfBtn" class="button">📑 <span id="pdfText">PDF</span></button>
@@ -997,6 +1071,9 @@ const loginTranslations = {
     }
 };
 
+// ==================== GLOBAL LANGUAGE ====================
+let langGLOBAL = 'pt';
+
 // ==================== GLOBAL STATE ====================
 let currentLang = 'pt';
 let currentLayout = 4;
@@ -1009,6 +1086,9 @@ let pastedCards = new Set();
 let currentEditIndex = -1;
 let db = { savedUsers: [], savedHospitals: [], savedCards: [], settings: { lastLayout: 4 } };
 let cryptoKey = null;
+
+// ==================== PASSWORD STORAGE ====================
+let savedLoginPassword = '';
 
 // ==================== LOGO STORAGE - SEPARATE FROM ENCRYPTED DATA ====================
 function saveLogosToStorage(logoData) {
@@ -1106,7 +1186,6 @@ function compressLogo(dataUrl) {
         const img = new Image();
         img.onload = function() {
             const canvas = document.createElement('canvas');
-            // Larger size for better quality in the container
             const maxSize = 300;
             let width = img.width;
             let height = img.height;
@@ -1139,7 +1218,6 @@ function clearCard(index) {
     if(index >= 0 && index < currentLayout) {
         cardData[index] = {};
         individualLogos[index] = null;
-        // Update logo storage
         const logoData = loadLogosFromStorage();
         logoData.individualLogos = individualLogos;
         saveLogosToStorage(logoData);
@@ -1152,7 +1230,6 @@ function applyToAll(field, value, processFn = null) {
     let updated = 0; 
     for(let i = 0; i < currentLayout; i++) { 
         if(!cardData[i]) cardData[i] = {}; 
-        // Apply to all cards regardless of existing value
         cardData[i][field] = processFn ? processFn(value) : value; 
         updated++; 
     } 
@@ -1163,52 +1240,19 @@ function applyToAll(field, value, processFn = null) {
     return updated; 
 }
 
-function applyToEmptyOnly(field, value, processFn = null) { 
-    let updated=0; 
-    for(let i=0;i<currentLayout;i++) { 
-        if(!cardData[i]) cardData[i]={}; 
-        if(isEmptyField(cardData[i][field])) { 
-            cardData[i][field] = processFn ? processFn(value) : value; 
-            updated++; 
-        } 
-    } 
-    if(updated>0) { 
-        renderCards(); 
-        showMessage(getTranslation('toastApplied', field, updated)); 
-    } 
-    return updated; 
-}
-
-function applyPatient(v) { 
-    const value = capitalize(sanitizeInput(v));
-    let updated = 0;
-    for(let i = 0; i < currentLayout; i++) { 
-        if(!cardData[i]) cardData[i] = {}; 
-        cardData[i].pacient = value; 
-        updated++; 
-    } 
-    if(updated > 0) { 
-        // Batch update - only render once
-        renderCards(); 
-        showMessage(getTranslation('toastApplied', 'Paciente', updated)); 
-    } 
-}
+function applyPatient(v) { applyToAll('pacient', capitalize(sanitizeInput(v))); }
 function applySpecialty(v) { applyToAll('speciality', sanitizeInput(v)); }
 function applyDate(v) { applyToAll('date', formatDateForDisplay(sanitizeInput(v))); }
 function applyTime(v) { applyToAll('hour', sanitizeInput(v)); }
 
-
-
-function applyHospitalWithAlias(fullValue, alias) { 
-    if (!fullValue) return;
-    const safe = sanitizeInput(fullValue);
-    const safeAlias = sanitizeInput(alias || fullValue);
+function applyHospital(v) { 
+    const safe = sanitizeInput(v);
+    const displayName = getHospitalDisplayName(safe);
     let up = 0; 
     for(let i = 0; i < currentLayout; i++) { 
         if(!cardData[i]) cardData[i] = {}; 
-        // Overwrite ALL cards - regardless of empty or not
         cardData[i].hospitalFullValue = safe; 
-        cardData[i].hospital = safeAlias; 
+        cardData[i].hospital = displayName; 
         up++; 
     } 
     if(up > 0) { 
@@ -1232,9 +1276,7 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
     
     let currentSelectedIndex = -1;
     let isSelectingFromDropdown = false;
-    let isDropdownOpen = false; // Track dropdown open state
-    
-    // Store reference to current items for selection
+    let isDropdownOpen = false;
     let currentItems = [];
     
     function renderDropdown(filter = '') {
@@ -1293,14 +1335,12 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         dropdown.style.display = 'none'; 
         isDropdownOpen = false;
         currentSelectedIndex = -1;
-        // Dispatch input event to trigger any listeners
         input.dispatchEvent(new Event('input', { bubbles: true }));
     }
     
     function openDropdown() { 
         if(storageArray.length > 0) {
             renderDropdown(input.value);
-            // Re-highlight if there was a previous selection
             if(currentSelectedIndex >= 0 && currentSelectedIndex < currentItems.length) {
                 updateSelection();
             }
@@ -1326,37 +1366,29 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         return false; 
     }
     
-    // Click on input - open dropdown
     input.addEventListener('click', (e) => { 
         e.stopPropagation(); 
-        // If dropdown is already open, keep it open; otherwise open it
         if (!isDropdownOpen) {
             openDropdown(); 
         } else {
-            // If it's open but hidden, show it again
             if (dropdown.style.display === 'none') {
                 openDropdown();
             }
         }
     });
     
-    // Input event - filter dropdown
     input.addEventListener('input', () => { 
         if (input.value.length > 0 || isDropdownOpen) {
             renderDropdown(input.value); 
             currentSelectedIndex = -1; 
         } else {
-            // If input is empty, show all items
             renderDropdown('');
             currentSelectedIndex = -1;
         }
     });
     
-    // Focus event - open dropdown when focusing the field
     input.addEventListener('focus', () => {
-        // If we're selecting from dropdown, don't reopen
         if (isSelectingFromDropdown) return;
-        // Small delay to allow click events to process
         setTimeout(() => {
             if (!isDropdownOpen && storageArray.length > 0) {
                 openDropdown();
@@ -1364,17 +1396,12 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }, 50);
     });
     
-    // Blur event - close dropdown when losing focus, but with delay to allow clicks
     input.addEventListener('blur', () => {
-        // Don't close immediately - allow clicks on dropdown items
         setTimeout(() => {
-            // Check if the new focus is inside the dropdown container
             const activeElement = document.activeElement;
             if (container.contains(activeElement) || (activeElement && activeElement.closest && activeElement.closest('.smart-dropdown'))) {
-                // Still inside dropdown, keep it open
                 return;
             }
-            // Check if we clicked on a dropdown item action button
             if (activeElement && (activeElement.classList.contains('item-edit') || activeElement.classList.contains('item-delete'))) {
                 return;
             }
@@ -1384,7 +1411,6 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }, 150);
     });
     
-    // Keyboard navigation
     input.addEventListener('keydown', (e) => {
         const isOpen = isDropdownOpen && dropdown.style.display === 'block';
         const items = dropdown.querySelectorAll('.dropdown-item');
@@ -1405,10 +1431,8 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
                 if (currentSelectedIndex >= 0) {
                     selectCurrent();
                 } else {
-                    // If nothing selected, close dropdown and let Enter save
                     dropdown.style.display = 'none';
                     isDropdownOpen = false;
-                    // Let the Enter key propagate for saving
                     return;
                 }
                 return;
@@ -1419,14 +1443,12 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
                 currentSelectedIndex = -1; 
                 e.preventDefault();
             }
-            // If we handled a navigation key, prevent default behavior
             if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) {
                 e.stopPropagation();
             }
             return;
         }
         
-        // If dropdown is not open and user presses Enter
         if(e.key === 'Enter' && !isOpen) {
             e.preventDefault();
             if(isSelectingFromDropdown) {
@@ -1445,14 +1467,12 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
             return;
         }
         
-        // ArrowDown to open dropdown if closed
         if(e.key === 'ArrowDown' && !isOpen) { 
             e.preventDefault(); 
             openDropdown(); 
         }
     });
     
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
         if (!container.contains(e.target)) {
             dropdown.style.display = 'none';
@@ -1461,7 +1481,6 @@ function setupSmartDropdown(inputId, containerId, storageArray, getValueFunc, it
         }
     });
     
-    // Store reference to input for modal save
     input._dropdownData = { dropdown, isDropdownOpen: () => isDropdownOpen, currentSelectedIndex: () => currentSelectedIndex, selectCurrent };
 }
 
@@ -1547,7 +1566,6 @@ function renderGlobalSavedItems() {
         </div>`;
     }).join('');
     
-    // Use event delegation instead of individual listeners
     usersDiv.addEventListener('click', function(e) {
         const target = e.target.closest('.saved-item-content');
         if (target) {
@@ -1560,14 +1578,12 @@ function renderGlobalSavedItems() {
             }
             return;
         }
-        
         const editBtn = e.target.closest('.saved-item-edit');
         if (editBtn) {
             e.stopPropagation();
             openEditSavedItem(editBtn.dataset.type, parseInt(editBtn.dataset.id), editBtn.dataset.alias, editBtn.dataset.value);
             return;
         }
-        
         const delBtn = e.target.closest('.saved-item-delete');
         if (delBtn) {
             e.stopPropagation();
@@ -1589,14 +1605,12 @@ function renderGlobalSavedItems() {
             }
             return;
         }
-        
         const editBtn = e.target.closest('.saved-item-edit');
         if (editBtn) {
             e.stopPropagation();
             openEditSavedItem(editBtn.dataset.type, parseInt(editBtn.dataset.id), editBtn.dataset.alias, editBtn.dataset.value);
             return;
         }
-        
         const delBtn = e.target.closest('.saved-item-delete');
         if (delBtn) {
             e.stopPropagation();
@@ -1606,6 +1620,7 @@ function renderGlobalSavedItems() {
         }
     });
 }
+
 function renderCards() {
     resizeArrays();
     const grid = document.getElementById('cardsGrid');
@@ -1635,7 +1650,6 @@ function renderCards() {
         const safeFooter1 = escapeHtml(t.cardFooter1);
         const safeFooter2 = escapeHtml(t.cardFooter2);
         
-        // Check if logo exists for background
         const hasLogo = logo ? true : false;
         const bgStyle = hasLogo ? `style="background-image: url('${escapeHtml(logo)}'); background-size: cover; background-position: center; background-repeat: no-repeat;"` : '';
         
@@ -1662,6 +1676,7 @@ function renderCards() {
     }
     attachCardEvents();
 }
+
 function attachCardEvents() {
     document.querySelectorAll('.copy-badge').forEach(b => { 
         b.onclick = (e) => { 
@@ -1703,35 +1718,35 @@ function attachCardEvents() {
     });
     
     document.querySelectorAll('.card-logo-container').forEach(cont => { 
-    cont.onclick = (e) => { 
-        e.stopPropagation(); 
-        const idx = parseInt(cont.dataset.logoIndex); 
-        const inp = document.createElement('input'); 
-        inp.type = 'file'; 
-        inp.accept = 'image/*'; 
-        inp.onchange = async (ev) => { 
-            const f = ev.target.files[0]; 
-            if(f) { 
-                const r = new FileReader(); 
-                r.onload = async (ev2) => { 
-                    try {
-                        const compressed = await compressLogo(ev2.target.result);
-                        individualLogos[idx] = compressed;
-                        const logoData = loadLogosFromStorage();
-                        logoData.individualLogos = individualLogos;
-                        saveLogosToStorage(logoData);
-                        renderCards(); 
-                        showMessage(getTranslation('toastLogoAdded')); 
-                    } catch(err) {
-                        showMessage(getTranslation('toastImageError'), 'error');
-                    }
-                }; 
-                r.readAsDataURL(f); 
-            } 
+        cont.onclick = (e) => { 
+            e.stopPropagation(); 
+            const idx = parseInt(cont.dataset.logoIndex); 
+            const inp = document.createElement('input'); 
+            inp.type = 'file'; 
+            inp.accept = 'image/*'; 
+            inp.onchange = async (ev) => { 
+                const f = ev.target.files[0]; 
+                if(f) { 
+                    const r = new FileReader(); 
+                    r.onload = async (ev2) => { 
+                        try {
+                            const compressed = await compressLogo(ev2.target.result);
+                            individualLogos[idx] = compressed;
+                            const logoData = loadLogosFromStorage();
+                            logoData.individualLogos = individualLogos;
+                            saveLogosToStorage(logoData);
+                            renderCards(); 
+                            showMessage(getTranslation('toastLogoAdded')); 
+                        } catch(err) {
+                            showMessage(getTranslation('toastImageError'), 'error');
+                        }
+                    }; 
+                    r.readAsDataURL(f); 
+                } 
+            }; 
+            inp.click(); 
         }; 
-        inp.click(); 
-    }; 
-});
+    });
 }
 
 // ==================== MODAL FUNCTIONS ====================
@@ -2104,18 +2119,15 @@ async function downloadImage() {
 // ==================== EXPORT ALL CARDS ====================
 function exportAllCardsWithConfig() {
     try {
-        // Count total cards in system
         let totalCards = 0;
         let totalSets = db.savedCards ? db.savedCards.length : 0;
         
-        // Count current cards
         for (let i = 0; i < 8; i++) {
             if (cardData[i] && (cardData[i].pacient || cardData[i].hospital || cardData[i].speciality || cardData[i].date || cardData[i].hour)) {
                 totalCards++;
             }
         }
         
-        // Count cards in saved sets
         if (db.savedCards) {
             for (const set of db.savedCards) {
                 if (set.cards) {
@@ -2155,7 +2167,6 @@ function exportAllCardsWithConfig() {
             allLogos: {}
         };
         
-        // Export current card data (all 8 slots)
         for (let i = 0; i < 8; i++) {
             const card = cardData[i] || {};
             exportData.currentCards.push({
@@ -2168,12 +2179,10 @@ function exportAllCardsWithConfig() {
             });
         }
         
-        // Export current logos (all 8 slots)
         for (let i = 0; i < 8; i++) {
             exportData.currentLogos.individualLogos.push(individualLogos[i] || null);
         }
         
-        // Export all saved sets with their logos
         if (db.savedCards && db.savedCards.length > 0) {
             for (const savedSet of db.savedCards) {
                 const setExport = {
@@ -2213,7 +2222,6 @@ function exportAllCardsWithConfig() {
             }
         }
         
-        // Export current logos to allLogos
         const currentLogoKey = 'current_logos_' + Date.now();
         const currentLogoData = {
             globalLogo: globalLogo,
@@ -2222,14 +2230,12 @@ function exportAllCardsWithConfig() {
         exportData.allLogos[currentLogoKey] = currentLogoData;
         exportData.currentLogoKey = currentLogoKey;
         
-        // Export encrypted database
         const encryptedData = localStorage.getItem('medcard_encrypted_v2');
         if (encryptedData) {
             exportData.encryptedDb = encryptedData;
             exportData.salt = localStorage.getItem('medcard_salt');
         }
         
-        // Create and download file
         const json = JSON.stringify(exportData, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -2255,7 +2261,6 @@ function importAllCardsWithConfig(file) {
         try {
             const importData = JSON.parse(e.target.result);
             
-            // Validate import data
             if (!importData.exportType || importData.exportType !== 'full_system_export') {
                 if (importData.cards && Array.isArray(importData.cards)) {
                     importCardsWithConfigFromData(importData);
@@ -2265,7 +2270,6 @@ function importAllCardsWithConfig(file) {
                 return;
             }
             
-            // Count what we're importing
             let totalCards = 0;
             if (importData.currentCards) {
                 totalCards += importData.currentCards.filter(c => c && (c.pacient || c.hospital || c.speciality || c.date || c.hour)).length;
@@ -2287,17 +2291,14 @@ function importAllCardsWithConfig(file) {
                 return;
             }
             
-            // Import saved users
             if (importData.savedUsers && Array.isArray(importData.savedUsers)) {
                 db.savedUsers = importData.savedUsers;
             }
             
-            // Import saved hospitals
             if (importData.savedHospitals && Array.isArray(importData.savedHospitals)) {
                 db.savedHospitals = importData.savedHospitals;
             }
             
-            // Import saved sets with their logos
             if (importData.savedSets && Array.isArray(importData.savedSets)) {
                 db.savedCards = importData.savedSets;
                 
@@ -2315,7 +2316,6 @@ function importAllCardsWithConfig(file) {
                 }
             }
             
-            // Import current data
             if (importData.currentCards && Array.isArray(importData.currentCards)) {
                 resetArrays();
                 const cardCount = Math.min(importData.currentCards.length, 8);
@@ -2332,7 +2332,6 @@ function importAllCardsWithConfig(file) {
                 }
             }
             
-            // Import current logos
             if (importData.currentLogos) {
                 globalLogo = importData.currentLogos.globalLogo || null;
                 if (importData.currentLogos.individualLogos) {
@@ -2347,7 +2346,6 @@ function importAllCardsWithConfig(file) {
                 saveLogosToStorage(logoData);
             }
             
-            // Update UI
             if (importData.currentLayout) {
                 currentLayout = importData.currentLayout;
                 db.settings.lastLayout = currentLayout;
@@ -2359,7 +2357,6 @@ function importAllCardsWithConfig(file) {
                 });
             }
             
-            // Update UI logo preview
             if (globalLogo) {
                 document.getElementById('logoPreview').src = globalLogo;
                 document.getElementById('logoPreview').style.display = 'block';
@@ -2371,9 +2368,7 @@ function importAllCardsWithConfig(file) {
                 document.getElementById('removeLogoBtn').style.display = 'none';
             }
             
-            // Save to database
             saveDb().then(() => {
-                // Re-render everything
                 renderCards();
                 renderSavedCardsList();
                 renderGlobalSavedItems();
@@ -2392,7 +2387,6 @@ function importAllCardsWithConfig(file) {
 }
 
 function importCardsWithConfigFromData(importData) {
-    // Handle standard export format
     if (!importData.cards || !Array.isArray(importData.cards)) {
         showMessage(getTranslation('toastInvalidFile'), 'error');
         return;
@@ -2588,7 +2582,6 @@ function updateLanguage(lang) {
     document.getElementById('previewTitle').textContent = t.previewTitle;
     document.getElementById('dbStatus').textContent = t.dbStatus;
     
-    // Update all buttons
     document.getElementById('exportDbText').textContent = t.exportDb;
     document.getElementById('importDbText').textContent = t.importDb;
     document.getElementById('exportAllText').textContent = t.exportAll;
@@ -2634,7 +2627,6 @@ function updateLanguage(lang) {
     document.getElementById('dangerZoneTitle').textContent = t.dangerZoneTitle;
     document.getElementById('savedSetsTitle').textContent = t.savedSetsTitle;
     
-    // Update language buttons in header - just toggle class, no inline styles
     document.querySelectorAll('.lang-btn').forEach(function(btn){ 
         if(btn.dataset.lang === lang) {
             btn.classList.add('active');
@@ -2644,6 +2636,7 @@ function updateLanguage(lang) {
     }); 
     renderCards(); 
 }
+
 // ==================== SMART ESC HANDLER ====================
 function handleEscKey(e) {
     if (e.key !== 'Escape') return;
@@ -2692,114 +2685,186 @@ function handleEscKey(e) {
 
 
 // ==================== PASSWORD PROMPT ====================
-    function showPasswordPrompt() {
-        const path = window.location.pathname;
-        const fileName = path.substring(path.lastIndexOf('/') + 1);
-        const match = fileName.match(/v\d+/);
-        const version = match ? match[0] : 'v32';
+function showPasswordPrompt() {
+    const path = window.location.pathname;
+    const fileName = path.substring(path.lastIndexOf('/') + 1);
+    const match = fileName.match(/v\d+/);
+    const version = match ? match[0] : 'v32';
 
-        // Get current language for login screen only
-        const lang = currentLang || 'pt';
-        const t = loginTranslations[lang] || loginTranslations.pt;
+    const lang = langGLOBAL || 'pt';
+    const t = loginTranslations[lang] || loginTranslations.pt;
 
-        const overlay = document.createElement('div'); 
-        overlay.className = 'password-prompt';
-        overlay.innerHTML = `
-          <div class="password-box">
-            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 12px;">
-              <button class="login-lang-btn" data-lang="pt" style="background: ${lang === 'pt' ? '#0f5c6e' : 'transparent'}; color: ${lang === 'pt' ? 'white' : '#0f5c6e'}; border: 2px solid #0f5c6e; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.7rem;">🇧🇷 PT</button>
-              <button class="login-lang-btn" data-lang="en" style="background: ${lang === 'en' ? '#0f5c6e' : 'transparent'}; color: ${lang === 'en' ? 'white' : '#0f5c6e'}; border: 2px solid #0f5c6e; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.7rem;">🇺🇸 EN</button>
-              <button class="login-lang-btn" data-lang="es" style="background: ${lang === 'es' ? '#0f5c6e' : 'transparent'}; color: ${lang === 'es' ? 'white' : '#0f5c6e'}; border: 2px solid #0f5c6e; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.7rem;">🇪🇸 ES</button>
-            </div>
-            <h2>${t.title}</h2>
-            <p>${t.subtitle}</p>
-            <p><strong>${t.desc}</strong></p>
-            <p style="font-size:0.8rem; color:#666;">${t.logos}</p>
-            <p style="font-size:0.7rem; color:#888;">${t.system}</p>
-            <p style="font-size:0.7rem; color:#888;">${t.esc}</p>
-            <input type="password" id="pwdInput" placeholder="${t.placeholder}" style="margin-top: 16px;">
-            <button id="unlockBtn" class="button secondary" style="margin-top: 12px;">${t.unlock}</button>
-            <button id="newDbBtn" class="button" style="margin-top: 8px;">${t.newDb}</button>
-            <div class="security-badge">${t.security}</div>
-          </div>
-        `;
+    // Get current password value before recreating
+    const currentPwdInput = document.getElementById('pwdInput');
+    if (currentPwdInput) {
+        savedLoginPassword = currentPwdInput.value;
+    }
 
-        document.body.appendChild(overlay);
-        
-        // Login screen language buttons - updates currentLang AND refreshes login screen
-        document.querySelectorAll('.login-lang-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const newLang = this.dataset.lang;
-                currentLang = newLang; // Update global language
-                // Refresh the login screen with new language
-                const loginOverlay = document.querySelector('.password-prompt');
-                if (loginOverlay) {
-                    loginOverlay.remove();
-                    showPasswordPrompt();
-                }
-            });
+    const overlay = document.createElement('div'); 
+    overlay.className = 'password-prompt';
+    overlay.innerHTML = `
+      <div class="password-box" style="color: #1a1a1a;">
+    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px;">
+        <button class="login-lang-btn" data-lang="pt"
+            style="background: ${lang === 'pt' ? '#0f5c6e' : 'transparent'}; 
+                   color: ${lang === 'pt' ? 'white' : '#0f5c6e'}; 
+                   border: 2px solid ${lang === 'pt' ? '#0f5c6e' : '#0f5c6e'}; 
+                   padding: 6px 16px; 
+                   border-radius: 25px; 
+                   cursor: pointer; 
+                   font-weight: 700; 
+                   font-size: 0.75rem; 
+                   min-height: 36px;
+                   transition: all 0.3s ease;
+                   box-shadow: ${lang === 'pt' ? '0 2px 8px rgba(15, 92, 110, 0.3)' : 'none'};"
+            onmouseover="this.style.background='${lang === 'pt' ? '#0a4654' : '#e6f4f0'}'; this.style.transform='scale(1.05)';"
+            onmouseout="this.style.background='${lang === 'pt' ? '#0f5c6e' : 'transparent'}'; this.style.transform='scale(1)';">
+            🇧🇷 PT
+        </button>
+        <button class="login-lang-btn" data-lang="en"
+            style="background: ${lang === 'en' ? '#0f5c6e' : 'transparent'}; 
+                   color: ${lang === 'en' ? 'white' : '#0f5c6e'}; 
+                   border: 2px solid ${lang === 'en' ? '#0f5c6e' : '#0f5c6e'}; 
+                   padding: 6px 16px; 
+                   border-radius: 25px; 
+                   cursor: pointer; 
+                   font-weight: 700; 
+                   font-size: 0.75rem; 
+                   min-height: 36px;
+                   transition: all 0.3s ease;
+                   box-shadow: ${lang === 'en' ? '0 2px 8px rgba(15, 92, 110, 0.3)' : 'none'};"
+            onmouseover="this.style.background='${lang === 'en' ? '#0a4654' : '#e6f4f0'}'; this.style.transform='scale(1.05)';"
+            onmouseout="this.style.background='${lang === 'en' ? '#0f5c6e' : 'transparent'}'; this.style.transform='scale(1)';">
+            🇺🇸 EN
+        </button>
+        <button class="login-lang-btn" data-lang="es"
+            style="background: ${lang === 'es' ? '#0f5c6e' : 'transparent'}; 
+                   color: ${lang === 'es' ? 'white' : '#0f5c6e'}; 
+                   border: 2px solid ${lang === 'es' ? '#0f5c6e' : '#0f5c6e'}; 
+                   padding: 6px 16px; 
+                   border-radius: 25px; 
+                   cursor: pointer; 
+                   font-weight: 700; 
+                   font-size: 0.75rem; 
+                   min-height: 36px;
+                   transition: all 0.3s ease;
+                   box-shadow: ${lang === 'es' ? '0 2px 8px rgba(15, 92, 110, 0.3)' : 'none'};"
+            onmouseover="this.style.background='${lang === 'es' ? '#0a4654' : '#e6f4f0'}'; this.style.transform='scale(1.05)';"
+            onmouseout="this.style.background='${lang === 'es' ? '#0f5c6e' : 'transparent'}'; this.style.transform='scale(1)';">
+            🇪🇸 ES
+        </button>
+    </div>
+        <h2 style="color: #1a1a1a;">${t.title}</h2>
+        <p style="color: #333;">${t.subtitle}</p>
+        <p style="color: #333;"><strong>${t.desc}</strong></p>
+        <p style="font-size:0.8rem; color:#666;">${t.logos}</p>
+        <p style="font-size:0.7rem; color:#888;">${t.system}</p>
+        <p style="font-size:0.7rem; color:#888;">${t.esc}</p>
+        <input type="password" id="pwdInput" placeholder="${t.placeholder}" style="margin-top: 16px; width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 16px; color: #1a1a1a;" value="${savedLoginPassword}">
+        <button id="unlockBtn" class="button secondary" style="margin-top: 12px; width: 100%;">${t.unlock}</button>
+        <button id="newDbBtn" class="button" style="margin-top: 8px; width: 100%;">${t.newDb}</button>
+        <div class="security-badge" style="margin-top: 16px; color: #555;">${t.security}</div>
+      </div>
+    `;
+
+    // Remove old overlay if exists
+    const oldOverlay = document.querySelector('.password-prompt');
+    if (oldOverlay) {
+        oldOverlay.remove();
+    }
+    
+    document.body.appendChild(overlay);
+    
+    // Focus and restore cursor position
+    const pwdInput = document.getElementById('pwdInput');
+    if (pwdInput) {
+        pwdInput.focus();
+        if (savedLoginPassword) {
+            pwdInput.setSelectionRange(savedLoginPassword.length, savedLoginPassword.length);
+        }
+    }
+    
+    // Login screen language buttons
+    document.querySelectorAll('.login-lang-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const newLang = this.dataset.lang;
+            // Save current password before changing language
+            const currentPwd = document.getElementById('pwdInput');
+            if (currentPwd) {
+                savedLoginPassword = currentPwd.value;
+            }
+            langGLOBAL = newLang;
+            showPasswordPrompt(); // Refresh with saved password
         });
-        
-        document.getElementById('unlockBtn').onclick = async function() { 
+    });
+    
+    // Save password on every input change
+    document.getElementById('pwdInput').addEventListener('input', function(e) {
+        savedLoginPassword = this.value;
+    });
+    
+    document.getElementById('unlockBtn').onclick = async function() { 
+        const password = document.getElementById('pwdInput').value; 
+        if(!password) return; 
+        try { 
+            const salt = getStoredSalt(); 
+            if(!salt) throw new Error('No salt'); 
+            await loadDb(password, salt); 
+            overlay.remove(); 
+            currentLang = langGLOBAL;
+            savedLoginPassword = ''; // Clear after successful login
+            initApp(); 
+            showMessage(getTranslation('toastUnlocked')); 
+        } catch(e) { 
+            alert('Senha incorreta!'); 
+            document.getElementById('pwdInput').value = ''; 
+            savedLoginPassword = '';
+            document.getElementById('pwdInput').focus();
+        } 
+    };
+    
+    document.getElementById('pwdInput').addEventListener('keydown', async function(e) { 
+        if(e.key === 'Enter') { 
             const password = document.getElementById('pwdInput').value; 
             if(!password) return; 
             try { 
                 const salt = getStoredSalt(); 
-                if(!salt) throw new Error('No salt'); 
                 await loadDb(password, salt); 
                 overlay.remove(); 
+                currentLang = langGLOBAL;
+                savedLoginPassword = ''; // Clear after successful login
                 initApp(); 
-                // After login, update app to use the selected language
-                updateLanguage(currentLang);
                 showMessage(getTranslation('toastUnlocked')); 
             } catch(e) { 
                 alert('Senha incorreta!'); 
                 document.getElementById('pwdInput').value = ''; 
+                savedLoginPassword = '';
+                document.getElementById('pwdInput').focus();
             } 
-        };
-        
-        document.getElementById('pwdInput').addEventListener('keydown', async function(e) { 
-            if(e.key === 'Enter') { 
-                const password = document.getElementById('pwdInput').value; 
-                if(!password) return; 
-                try { 
-                    const salt = getStoredSalt(); 
-                    await loadDb(password, salt); 
-                    overlay.remove(); 
-                    initApp(); 
-                    // After login, update app to use the selected language
-                    updateLanguage(currentLang);
-                    showMessage(getTranslation('toastUnlocked')); 
-                } catch(e) { 
-                    alert('Senha incorreta!'); 
-                    document.getElementById('pwdInput').value = ''; 
-                } 
-            } 
-        });
-        
-        document.getElementById('newDbBtn').onclick = async function() { 
-            const password = prompt('Digite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA!'); 
-            if(password && password.length>=4) { 
-                const confirmPwd = prompt('Confirme a senha:'); 
-                if(password===confirmPwd) { 
-                    await createNewDb(password); 
-                    overlay.remove(); 
-                    initApp(); 
-                    // After creating new DB, update app to use the selected language
-                    updateLanguage(currentLang);
-                    showMessage(getTranslation('toastNewDb')); 
-                } else alert('Senhas não coincidem!'); 
-            } else alert('Senha deve ter no mínimo 4 caracteres!'); 
-        };
-    }
+        } 
+    });
+    
+    document.getElementById('newDbBtn').onclick = async function() { 
+        const password = prompt('Digite uma senha forte (mínimo 4 caracteres):\n\n⚠️ GUARDE ESTA SENHA!'); 
+        if(password && password.length>=4) { 
+            const confirmPwd = prompt('Confirme a senha:'); 
+            if(password===confirmPwd) { 
+                await createNewDb(password); 
+                overlay.remove(); 
+                currentLang = langGLOBAL;
+                savedLoginPassword = '';
+                initApp(); 
+                showMessage(getTranslation('toastNewDb')); 
+            } else alert('Senhas não coincidem!'); 
+        } else alert('Senha deve ter no mínimo 4 caracteres!'); 
+    };
+}
+
 // ==================== INIT APP ====================
 async function initApp() {
     populateSpecialties();
-    
     resetArrays();
-    
     globalLogo = null;
-    
     clearLogosStorage();
     
     document.getElementById('logoPreview').style.display = 'none'; 
@@ -2834,7 +2899,6 @@ async function initApp() {
     document.getElementById('dbStatus').textContent = t.dbStatus;
     setupAllDropdowns();
     
-    // ============ SAVE SET MODAL ============
     const saveSetModal = document.getElementById('saveSetModal');
     const setNameInput = document.getElementById('setName');
 
@@ -2857,15 +2921,6 @@ async function initApp() {
         }
     });
 
-    /*
-    saveSetModal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
-            setNameInput.value = '';
-        }
-    });
-    */
-    
     document.getElementById('saveSetBtn').onclick = function() {
         const modal = document.getElementById('saveSetModal');
         modal.style.display = 'flex';
@@ -2877,40 +2932,8 @@ async function initApp() {
         }, 100);
     };
 
-    // ============ EDIT MODAL ============
-    /*
-    const editModal = document.getElementById('editModal');
-    editModal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
-        }
-    });
-    */
-
-    /*
-    // ============ SAVE ITEM MODAL ============
-    const saveItemModal = document.getElementById('saveItemModal');
-    saveItemModal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
-        }
-    });
-    */
-
-    // ============ EDIT SAVED ITEM MODAL ============
-    /*
-    const editSavedItemModal = document.getElementById('editSavedItemModal');
-    editSavedItemModal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
-        }
-    });
-    */
-
-    // ============ GLOBAL ESC KEY HANDLER WITH SMART BEHAVIOR ============
     document.addEventListener('keydown', handleEscKey);
 
-    // ============ OTHER BUTTONS ============
     document.getElementById('resetBtn').onclick = resetAll;
     document.getElementById('pdfBtn').onclick = generatePDF;
     document.getElementById('printBtn').onclick = printPreview;
@@ -3088,7 +3111,6 @@ async function initApp() {
         } 
     };
     
-    // ============ EXPORT/IMPORT CARDS ============
     document.getElementById('exportCardsBtn').onclick = function() {
         exportAllCardsWithConfig();
     };
@@ -3135,21 +3157,20 @@ async function initApp() {
     };
     
     document.querySelectorAll('.lang-btn').forEach(function(btn) { 
-    btn.addEventListener('click', function() { 
-        const newLang = this.dataset.lang;
-        langGLOBAL = newLang; // Update GLOBAL language
-        currentLang = newLang;
-        updateLanguage(newLang);
-        
-        // If login screen is visible, refresh it
-        const loginOverlay = document.querySelector('.password-prompt');
-        if (loginOverlay) {
-            loginOverlay.remove();
-            showPasswordPrompt();
-        }
-    }); 
-});
-    //updateLanguage('en');
+        btn.addEventListener('click', function() { 
+            const newLang = this.dataset.lang;
+            langGLOBAL = newLang;
+            currentLang = newLang;
+            updateLanguage(newLang);
+            
+            const loginOverlay = document.querySelector('.password-prompt');
+            if (loginOverlay) {
+                loginOverlay.remove();
+                showPasswordPrompt();
+            }
+        }); 
+    });
+    updateLanguage(langGLOBAL);
 }
 
 // ==================== START ====================
@@ -3221,16 +3242,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ==================== VERSION EXTRACTION ====================
-//const path = window.location.pathname;
-//const fileName = path.substring(path.lastIndexOf('/') + 1);
-//const match = fileName.match(/v\d+/);
-//const APP_VERSION = match ? match[0] : 'v32';
 
-// Update title
+// ==================== VERSION EXTRACTION ====================
+/*const path = window.location.pathname;
+const fileName = path.substring(path.lastIndexOf('/') + 1);
+const match = fileName.match(/v\d+/);
+const APP_VERSION = match ? match[0] : 'v32';
+*/
 document.title = `MedCard Pro ${APP_VERSION} - Full Export`;
 
-// Update app title in header when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     const appTitle = document.getElementById('appTitle');
     if (appTitle) {
@@ -3246,7 +3266,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('appTitle').textContent = t.appTitle;
     }
 });
-
 
 </script>
 </body>
