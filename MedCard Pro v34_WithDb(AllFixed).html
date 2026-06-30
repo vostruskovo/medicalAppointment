@@ -1199,16 +1199,14 @@ function applyTime(v) { applyToAll('hour', sanitizeInput(v)); }
 
 
 
-function applyHospitalWithAlias(fullValue, alias) { 
-    if (!fullValue) return;
-    const safe = sanitizeInput(fullValue);
-    const safeAlias = sanitizeInput(alias || fullValue);
+function applyHospital(v) { 
+    const safe = sanitizeInput(v);
+    const displayName = getHospitalDisplayName(safe);
     let up = 0; 
     for(let i = 0; i < currentLayout; i++) { 
         if(!cardData[i]) cardData[i] = {}; 
-        // Overwrite ALL cards - regardless of empty or not
         cardData[i].hospitalFullValue = safe; 
-        cardData[i].hospital = safeAlias; 
+        cardData[i].hospital = displayName; 
         up++; 
     } 
     if(up > 0) { 
